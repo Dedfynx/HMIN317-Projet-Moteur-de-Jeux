@@ -49,30 +49,69 @@
 ****************************************************************************/
 
 #include "mainwidget.h"
-#include "GameObject.h"
-#include "GameComponent.h"
-#include "MeshRenderer.h"
-#include "Transformation.h"
+#include "transform.h"
 
 #include <QMouseEvent>
-#include <QKeyEvent>
 
 #include <math.h>
 
 MainWidget::MainWidget(QWidget *parent) :
     QOpenGLWidget(parent),
     geometries(0),
-    textureCube(0),
-    textureGrass(0),
-    textureRocks(0),
-    textureSnowrocks(0),
-    heightmap(nullptr),
-    angularSpeed(0)
-{
-    viewOrbital.rotate(-45.0,1,0,0);
-    viewOrbital.translate(0,0,10);
+    texture(0),
+    angularSpeed(0),
+    camera(),
+    terre(),
+    lune(),
+    luneL(),
+    plan(),
+    truc()
 
-    view.rotate(-45.0,1,0,0);
+{
+    //init
+    //camera.addEnfant(terre);
+    camera.addEnfant(plan);
+
+    plan.addEnfant(truc);
+    /*
+    terre.addEnfant(lune);
+    lune.addEnfant(luneL);*/
+
+    plan.transform.translate(QVector3D(0, 0, -200.0));
+    plan.transform.translate(translation);
+    plan.transform.scale(QVector3D(4.0f, 4.0f,  4.0f));
+
+    truc.setPos(20.0,20.0,20.0);
+    truc.transform.update(plan.transform.getMatrice());
+    truc.transform.translate(QVector3D(truc.getPos().at(0),truc.getPos().at(1),truc.getPos().at(2)));
+    truc.transform.translate(translation);
+    //truc.transform.scale(QVector3D(4.0f, 4.0f,  4.0f));
+
+
+    /*
+    terre.transform.translate(QVector3D(0, 0, -200.0));
+    terre.transform.translate(translation);
+    terre.transform.scale(QVector3D(4.0f, 4.0f,  4.0f));
+
+    terre.transform.rotate(rotation);
+
+    QMatrix4x4 tmp = terre.transform.getMatrice();
+    QQuaternion ergertgezrg = QQuaternion::fromAxisAndAngle(QVector3D(0,0,1), 23) * rotation;
+    terre.transform.rotate(ergertgezrg);
+
+    lune.transform.update(tmp);
+
+    lune.transform.translate(QVector3D(20,0,0));
+    lune.transform.scale(QVector3D(0.30f, 0.30f,  0.30f));
+    QQuaternion r = QQuaternion::fromAxisAndAngle(QVector3D(0,1,0), 5) * rotation;
+    lune.transform.rotate(r);
+
+    luneL.transform.update(lune.transform.getMatrice());
+
+    luneL.transform.translate(QVector3D(20,0,0));
+    luneL.transform.scale(QVector3D(0.30f, 0.30f,  0.30f));
+    luneL.transform.rotate(r);
+    */
 }
 
 MainWidget::~MainWidget()
@@ -80,10 +119,7 @@ MainWidget::~MainWidget()
     // Make sure the context is current when deleting the texture
     // and the buffers.
     makeCurrent();
-    delete textureCube;
-    delete textureSnowrocks;
-    delete textureRocks;
-    delete textureGrass;
+    delete texture;
     delete geometries;
     doneCurrent();
 }
@@ -114,32 +150,78 @@ void MainWidget::mouseReleaseEvent(QMouseEvent *e)
     angularSpeed += acc;
 }
 //! [0]
+void MainWidget::keyPressEvent(QKeyEvent *ev){
+    switch ( ev->key() )
+        {
+            case Qt::Key_Escape :
+                close();
+                break;
+            case Qt::Key_Z :
+                translation.setY(translation.y() + 1);
+                update();
+                break;
+            case Qt::Key_Q :
+                translation.setX(translation.x() - 1);
+                update();
+                break;
+            case Qt::Key_S :
+                translation.setY(translation.y() - 1);
+                update();
+                break;
+            case Qt::Key_D :
+                translation.setX(translation.x() + 1);
+                update();
+                break;
+            case Qt::Key_Up:
+                translation.setZ(translation.z() + 1);
+                update();
+                break;
+            case Qt::Key_Down:
+                translation.setZ(translation.z() - 1);
+                update();
+                break;
+            case Qt::Key_C :
+                //mode orbital
 
+                //orbital ^= true;
+                //rester appuyer sur C
+                /*
+                if(orbital){
+                    rotation = QQuaternion::fromAxisAndAngle(QVector3D(0,1,0), 5) * rotation;
+                }
+                */
+                rotation = QQuaternion::fromAxisAndAngle(QVector3D(0,1,0), 5) * rotation;
+                update();
+                break;
+    case Qt::Key_I :
+
+        break;
+        }
+    //printf("\nkey event in board: %i", ev->key());
+
+}
 //! [1]
 void MainWidget::timerEvent(QTimerEvent *)
 {
+    //update
+    //rotation planete
+    //rotation = QQuaternion::fromAxisAndAngle(QVector3D(0,1,0), 1.5) * rotation;
+    update();
+
+    //
     // Decrease angular speed (friction)
     angularSpeed *= 0.99;
-
-    //update orbital view rotation
-    viewOrbital.rotate(1,0,0,1);
-
 
     // Stop rotation when speed goes below threshold
     if (angularSpeed < 0.01) {
         angularSpeed = 0.0;
     } else {
         // Update rotation
-        //rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed) * rotation;
-        
+        rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed) * rotation;
 
         // Request an update
-   
+        update();
     }
-
-    rotation=QQuaternion::fromAxisAndAngle(QVector3D(1.0,1.0,1.0),1.0) * rotation;
-
-    update();
 }
 //! [1]
 
@@ -164,44 +246,6 @@ void MainWidget::initializeGL()
 
     // Use QBasicTimer because its faster than QTimer
     timer.start(12, this);
-
-    ///////////////////scene graph ////////////////////////////////
-
-    GameComponent* sphere_MeshRenderer1 = new MeshRenderer(":/sphere.off");
-    GameComponent* sphere_MeshRenderer2 = new MeshRenderer(":/sphere.off");
-    GameComponent* sphere_MeshRenderer3 = new MeshRenderer(":/sphere.off");
-
-    camera = new GameObject();
-    Transformation t_camera;
-    t_camera.translate(QVector3D(-8.0, -8.0, -30.0));
-    camera->setTransformation(t_camera);
-
-    soleil = new GameObject();
-    QQuaternion rotationSoleil = QQuaternion::fromAxisAndAngle(QVector3D(1.0,1.0,1.0), 20) * rotation;
-    Transformation t_soleil(QVector3D(0.0,0.0,-15.0),rotationSoleil,QVector3D(1.0,1.0,1.0));
-    soleil->setTransformation(t_soleil);
-    soleil->addComponent(sphere_MeshRenderer1);
-
-    root.addChildren(soleil);
-
-    terre = new GameObject();
-    QQuaternion rotationTerre = QQuaternion::fromAxisAndAngle(QVector3D(1.0,1.0,1.0), 20) * rotation;
-    Transformation t_terre(soleil->getTransformation().m,QVector3D(5.0,0.0,0.0),rotationTerre,QVector3D(0.5,0.5,0.5));
-    terre->setTransformation(t_terre);
-    terre->addComponent(sphere_MeshRenderer2);
-
-    soleil->addChildren(terre);
-
-    lune = new GameObject();
-    QQuaternion rotationLune = QQuaternion::fromAxisAndAngle(QVector3D(1.0,1.0,1.0), 20) * rotation;
-    Transformation t_lune(terre->getTransformation().m, QVector3D(-5.0,0.0,0.0),rotationLune,QVector3D(0.5,0.5,0.5));
-    lune->setTransformation(t_lune);
-    lune->addComponent(sphere_MeshRenderer3);
-
-    terre->addChildren(lune);
-    
-
-    ////////////////////////////////////////////////////////////////
 }
 
 //! [3]
@@ -228,46 +272,18 @@ void MainWidget::initShaders()
 //! [4]
 void MainWidget::initTextures()
 {
-        // Load cube.png image
-    textureCube = new QOpenGLTexture(QImage(":/cube.png").mirrored());
-        // Set nearest filtering mode for texture minification
-    textureCube->setMinificationFilter(QOpenGLTexture::Nearest);
+    // Load cube.png image
+    texture = new QOpenGLTexture(QImage(":/rock.png").mirrored());
+
+    // Set nearest filtering mode for texture minification
+    texture->setMinificationFilter(QOpenGLTexture::Nearest);
 
     // Set bilinear filtering mode for texture magnification
-    textureCube->setMagnificationFilter(QOpenGLTexture::Linear);
+    texture->setMagnificationFilter(QOpenGLTexture::Linear);
 
     // Wrap texture coordinates by repeating
     // f.ex. texture coordinate (1.1, 1.2) is same as (0.1, 0.2)
-    textureCube->setWrapMode(QOpenGLTexture::Repeat);
-
-
-    //heightmap
-    heightmap = new QOpenGLTexture(QImage(":/heightmap-1024x1024.png").mirrored());
-    heightmap->setMinificationFilter(QOpenGLTexture::Nearest);
-    heightmap->setMagnificationFilter(QOpenGLTexture::Linear);
-    heightmap->setWrapMode(QOpenGLTexture::Repeat);
-    
-
-    //load grass image
-    textureGrass = new QOpenGLTexture(QImage(":/grass.png").mirrored());
-    textureGrass->setMinificationFilter(QOpenGLTexture::Nearest);
-    textureGrass->setMagnificationFilter(QOpenGLTexture::Linear);
-    textureGrass->setWrapMode(QOpenGLTexture::Repeat);
-
-    //load rocks image
-    textureRocks = new QOpenGLTexture(QImage(":/rock.png").mirrored());
-    textureRocks->setMinificationFilter(QOpenGLTexture::Nearest);
-    textureRocks->setMagnificationFilter(QOpenGLTexture::Linear);
-    textureRocks->setWrapMode(QOpenGLTexture::Repeat);
-
-
-    //load snowrocks image
-    textureSnowrocks = new QOpenGLTexture(QImage(":/snowrocks.png").mirrored());
-    textureSnowrocks->setMinificationFilter(QOpenGLTexture::Nearest);
-    textureSnowrocks->setMagnificationFilter(QOpenGLTexture::Linear);
-    textureSnowrocks->setWrapMode(QOpenGLTexture::Repeat);
-
-
+    texture->setWrapMode(QOpenGLTexture::Repeat);
 }
 //! [4]
 
@@ -278,7 +294,7 @@ void MainWidget::resizeGL(int w, int h)
     qreal aspect = qreal(w) / qreal(h ? h : 1);
 
     // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
-    const qreal zNear = 3.0, zFar = 200.0, fov = 45.0;
+    const qreal zNear = 3.0, zFar = 500.0, fov = 45.0;
 
     // Reset projection
     projection.setToIdentity();
@@ -293,97 +309,81 @@ void MainWidget::paintGL()
     // Clear color and depth buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //textureCube->bind();
-    //textureSnowrocks->bind();
-    //textureRocks->bind(); 
-    heightmap->bind();
-    //textureGrass->bind();
+    texture->bind();
 
 //! [6]
     // Calculate model view transformation
-    QMatrix4x4 matrix; //camera
-    matrix.translate(-8.0, -8.0, -30.0);
-    //matrix.rotate(rotation);
+    QMatrix4x4 matrix;
+    //translate Camera
 
+    camera.transform.translate(translation);
+    translation.setX(0);
+    translation.setY(0);
+    translation.setZ(0);
 
-    if(isorbitalView){
-        // Set modelview-projection matrix
-        program.setUniformValue("mvp_matrix", projection * matrix * viewOrbital);
-    }
-    else{
-        program.setUniformValue("mvp_matrix", projection * matrix * view);
-    }
+    QQuaternion r = QQuaternion::fromAxisAndAngle(QVector3D(0,1,0), 5) * rotation;
 
-//! [6]
+    plan.transform.update(camera.transform.getMatrice());
 
-    // Use texture unit 0 which contains cube.png
+    plan.transform.translate(QVector3D(-50, -10, -200.0));
+    plan.transform.scale(QVector3D(4.0f, 4.0f,  4.0f));
+    QQuaternion j = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0), -90);
+    plan.transform.rotate(j);
+    plan.transform.rotate(rotation);
+
+    //Draw Plan
+    program.setUniformValue("mvp_matrix", projection * plan.transform.getMatrice());
     program.setUniformValue("texture", 0);
+    geometries->drawPlanGeometry(&program);
 
-    // Draw cube geometry
-    //geometries->drawCubeGeometry(&program);
-
-    //draw plane surface
-    //geometries->drawPlaneSurfaceGeometry(&program);
-
-    soleil->transformation.update(root.transformation.m);
-    QQuaternion rotationSoleil = QQuaternion::fromAxisAndAngle(QVector3D(1.0,1.0,1.0), 20) * rotation;
-    soleil->transformation.translate(QVector3D(0.0,0.0,-15.0));
-    soleil->transformation.rotate(rotationSoleil);
-    soleil->transformation.scale(QVector3D(1.0,1.0,1.0));
-
-    terre->transformation.update(soleil->transformation.m);
-    QQuaternion rotationTerre = QQuaternion::fromAxisAndAngle(QVector3D(1.0,1.0,1.0), 20) * rotation;
-    terre->transformation.translate(QVector3D(5.0,0.0,0.0));
-    terre->transformation.rotate(rotationTerre);
-    terre->transformation.scale(QVector3D(0.5,0.5,0.5));
-
-    lune->transformation.update(terre->transformation.m);
-    QQuaternion rotationLune = QQuaternion::fromAxisAndAngle(QVector3D(1.0,1.0,1.0), 20) * rotation;
-    lune->transformation.translate(QVector3D(-5.0,0.0,0.0));
-    lune->transformation.rotate(rotationLune);
-    lune->transformation.scale(QVector3D(0.5,0.5,0.5));
-
-
-    root.render(&program,projection,matrix);
-}
-
-void MainWidget::keyPressEvent(QKeyEvent *event)
-{
-    float translate_size=0.5;
-    float rotate_size=5.0;
-
-    if(event->key() == Qt::Key_Z){
-        view.translate(0.0,-translate_size,0.0); update();
-    }
-    if(event->key() == Qt::Key_S){
-        view.translate(0.0,translate_size,0.0); update();
-    }
-    if(event->key() == Qt::Key_D){
-        view.translate(-translate_size,0.0,0.0); update();
-    }
-    if(event->key() == Qt::Key_Q){
-        view.translate(translate_size,0.0,0.0); update();
-    }
-    if(event->key() == Qt::Key_Up){
-        view.translate(0.0,0.0,translate_size); update();
-    }
-    if(event->key() == Qt::Key_Down){
-        view.translate(0.0,0.0,-translate_size); update();
+    //chute et verif
+    float vitGravite = 0.1;
+    if(truc.getPos().at(2) > 1.0){
+        truc.setPos(truc.getPos().at(0),truc.getPos().at(1),truc.getPos().at(2)-vitGravite);
     }
 
-    if(event->key() == Qt::Key_A){
-        view.rotate(-rotate_size,0,0,1); update();
-    }
-    if(event->key() == Qt::Key_E){
-        view.rotate(rotate_size,0,0,1); update();
-    }
-    if(event->key() == Qt::Key_C){
-        if(isorbitalView){
-            isorbitalView=false; update();
-        }
-        else{
-            isorbitalView=true;
-            update();
-        }
-    }
+
+    truc.transform.update(plan.transform.getMatrice());
+    truc.transform.translate(QVector3D(truc.getPos().at(0),truc.getPos().at(1),truc.getPos().at(2)));
+    truc.transform.translate(translation);
+
+    //Draw truc
+    program.setUniformValue("mvp_matrix", projection * truc.transform.getMatrice());
+    program.setUniformValue("texture", 0);
+    geometries->drawCubeGeometry(&program);
+
+    /*
+    terre.transform.update(camera.transform.getMatrice());
+    //reset de la position initiale terre
+    terre.transform.translate(QVector3D(0, 0, -200.0));
+    terre.transform.scale(QVector3D(4.0f, 4.0f,  4.0f));
+
+    //rotation
+
+    terre.transform.rotate(r);
+    //update de la matrice de la lune avant les 23 degree
+    lune.transform.update(terre.transform.getMatrice());
+    QQuaternion ergertgezrg = QQuaternion::fromAxisAndAngle(QVector3D(0,0,1), 23) * rotation;
+    terre.transform.rotate(ergertgezrg);
+
+    //Draw Terre
+    program.setUniformValue("mvp_matrix", projection * terre.transform.getMatrice());
+    program.setUniformValue("texture", 0);
+    geometries->drawCubeGeometry(&program);
+
+    //reset position lune
+    lune.transform.translate(QVector3D(20,0,0));
+    lune.transform.scale(QVector3D(0.30f, 0.30f,  0.30f));
+    lune.transform.rotate(r);
+    lune.update();
+    //Draw lune
+    program.setUniformValue("mvp_matrix", projection * lune.transform.getMatrice());
+    geometries->drawCubeGeometry(&program);
+
+    luneL.transform.update(lune.transform.getMatrice());
+    luneL.transform.translate(QVector3D(20,0,0));
+    luneL.transform.scale(QVector3D(0.30f, 0.30f,  0.30f));
+    program.setUniformValue("mvp_matrix", projection * luneL.transform.getMatrice());
+    geometries->drawCubeGeometry(&program);
+    */
 }

@@ -62,16 +62,16 @@ public:
     virtual ~GeometryEngine();
 
     void drawCubeGeometry(QOpenGLShaderProgram *program);
-    void drawPlaneSurfaceGeometry(QOpenGLShaderProgram *program);
-
+    void drawPlanGeometry(QOpenGLShaderProgram *program);
 
 private:
     void initCubeGeometry();
-    void initPlaneSurfaceGeometry(int longueur, int largeur);
+    void initPlanGeometry();
 
     QOpenGLBuffer arrayBuf;
     QOpenGLBuffer indexBuf;
-    int nbIndices;
+
+    int indicesCount;
 };
 
 #endif // GEOMETRYENGINE_H

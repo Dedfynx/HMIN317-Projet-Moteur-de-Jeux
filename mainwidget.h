@@ -52,8 +52,6 @@
 #define MAINWIDGET_H
 
 #include "geometryengine.h"
-#include "GameObject.h"
-#include "GameComponent.h"
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_1>
@@ -64,6 +62,9 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 
+#include "gameobject.h"
+
+
 class GeometryEngine;
 
 class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_1
@@ -73,15 +74,13 @@ class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_1
 public:
     explicit MainWidget(QWidget *parent = 0);
     ~MainWidget();
-    QMatrix4x4 view;
-    QMatrix4x4 viewOrbital;
-    bool isorbitalView = false;
 
 protected:
     void mousePressEvent(QMouseEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *e) override;
     void timerEvent(QTimerEvent *e) override;
-    void keyPressEvent(QKeyEvent *event) override;
+
+    void keyPressEvent(QKeyEvent *e) override;
 
     void initializeGL() override;
     void resizeGL(int w, int h) override;
@@ -95,13 +94,7 @@ private:
     QOpenGLShaderProgram program;
     GeometryEngine *geometries;
 
-    QOpenGLTexture *textureCube;
-
-    QOpenGLTexture *textureGrass;
-    QOpenGLTexture *textureRocks;
-    QOpenGLTexture *textureSnowrocks;
-    //heightmap
-    QOpenGLTexture *heightmap;
+    QOpenGLTexture *texture;
 
     QMatrix4x4 projection;
 
@@ -110,17 +103,18 @@ private:
     qreal angularSpeed;
     QQuaternion rotation;
 
-    //scene graph
-    GameObject root;
+    QVector3D translation;
 
+    //tp3
+    GameObject camera;
+    GameObject terre;
+    GameObject lune;
+    GameObject luneL;
 
-    GameComponent* sphere_MeshRenderer1;
-    GameComponent* sphere_MeshRenderer2;
-    GameComponent* sphere_MeshRenderer3;
-    GameObject* camera;
-    GameObject* soleil;
-    GameObject* terre;
-    GameObject* lune;
+    //tp4 mouvement
+    GameObject plan;
+    GameObject truc;
+
 };
 
 #endif // MAINWIDGET_H
