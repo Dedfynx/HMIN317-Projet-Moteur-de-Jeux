@@ -79,17 +79,18 @@ MainWidget::MainWidget(QWidget *parent) :
     plan = new GameObject();
     truc = new GameObject();
 
+    camPos = QVector3D(0.0f,-10.0f,20.0f);
+    center = QVector3D(0.0f,0.0f,0.0f),up = QVector3D(0.0f,1.0f,0.0f);
+    camSpeed = 0.05f;
 
+    view.lookAt(camPos,center,up);
 
     std::cout<<"oui"<<std::endl;
 
-    //camera.addEnfant(terre);
     camera->addEnfant(plan);
 
     plan->addEnfant(truc);
-    /*
-    terre.addEnfant(lune);
-    lune.addEnfant(luneL);*/
+
 
     plan->transform.translate(QVector3D(-15.0, -15.0, -200.0));
     plan->transform.translate(translation);
@@ -99,33 +100,7 @@ MainWidget::MainWidget(QWidget *parent) :
     truc->transform.update(plan->transform.getMatrice());
     truc->transform.translate(QVector3D(truc->getPos().at(0),truc->getPos().at(1),truc->getPos().at(2)));
     truc->transform.translate(translation);
-    //truc->transform.scale(QVector3D(4.0f, 4.0f,  4.0f));
 
-
-    /*
-    terre.transform.translate(QVector3D(0, 0, -200.0));
-    terre.transform.translate(translation);
-    terre.transform.scale(QVector3D(4.0f, 4.0f,  4.0f));
-
-    terre.transform.rotate(rotation);
-
-    QMatrix4x4 tmp = terre.transform.getMatrice();
-    QQuaternion ergertgezrg = QQuaternion::fromAxisAndAngle(QVector3D(0,0,1), 23) * rotation;
-    terre.transform.rotate(ergertgezrg);
-
-    lune.transform.update(tmp);
-
-    lune.transform.translate(QVector3D(20,0,0));
-    lune.transform.scale(QVector3D(0.30f, 0.30f,  0.30f));
-    QQuaternion r = QQuaternion::fromAxisAndAngle(QVector3D(0,1,0), 5) * rotation;
-    lune.transform.rotate(r);
-
-    luneL.transform.update(lune.transform.getMatrice());
-
-    luneL.transform.translate(QVector3D(20,0,0));
-    luneL.transform.scale(QVector3D(0.30f, 0.30f,  0.30f));
-    luneL.transform.rotate(r);
-    */
 }
 
 MainWidget::~MainWidget()
@@ -171,19 +146,23 @@ void MainWidget::keyPressEvent(QKeyEvent *ev){
                 close();
                 break;
             case Qt::Key_Z :
-                translation.setZ(translation.z() + 1);
+                //translation.setZ(translation.z() + 1);
+                camPos += QVector3D(0.0,0.0,0.1);
+                view.lookAt(camPos,center,up);
                 update();
                 break;
             case Qt::Key_Q :
-                rotation = QQuaternion::fromAxisAndAngle(QVector3D(0,0,1), 0.5) * rotation;
+                rotation = QQuaternion::fromAxisAndAngle(QVector3D(0,1,0), 0.5) * rotation;
                 update();
                 break;
             case Qt::Key_S :
-                translation.setZ(translation.z() - 1);
+                //translation.setZ(translation.z() - 1);
+                camPos -= QVector3D(0.0,0.0,0.1);
+                view.lookAt(camPos,center,up);
                 update();
                 break;
             case Qt::Key_D :
-                rotation = QQuaternion::fromAxisAndAngle(QVector3D(0,0,1), -0.5) * rotation;
+                rotation = QQuaternion::fromAxisAndAngle(QVector3D(0,1,0), -0.5) * rotation;
                 update();
                 break;
             case Qt::Key_Up:
@@ -195,11 +174,13 @@ void MainWidget::keyPressEvent(QKeyEvent *ev){
                 update();
                 break;
             case Qt::Key_Right:
-                translation.setX(translation.y() - 1);
+                camPos += center * camSpeed;
+                view.lookAt(camPos,center,up);
                 update();
                 break;
             case Qt::Key_Left:
-                translation.setX(translation.y() + 1);
+                camPos.setX(camPos.x() - 0.1f);
+                view.lookAt(camPos,center,up);
                 update();
                 break;
             case Qt::Key_C :
@@ -328,6 +309,8 @@ void MainWidget::resizeGL(int w, int h)
 
     // Set perspective projection
     projection.perspective(fov, aspect, zNear, zFar);
+
+
 }
 //! [5]
 
@@ -344,26 +327,31 @@ void MainWidget::paintGL()
     //translate Camera
 
     camera->transform.translate(translation);
+
+    //camPos = QVector3D(0,0,0);
+    std::cout << camPos.x() << " " << camPos.y() << " " << camPos.z() << std::endl;
+
+    camera->transform.rotate(rotation);
+    rotation = QQuaternion::fromAxisAndAngle(QVector3D(0,0,0), 0);
     translation.setX(0);
     translation.setY(0);
     translation.setZ(0);
 
-    QQuaternion r = QQuaternion::fromAxisAndAngle(QVector3D(0,1,0), 5) * rotation;
 
     plan->transform.update(camera->transform.getMatrice());
 
-    plan->transform.translate(QVector3D(-50, -10, -200.0));
-    plan->transform.scale(QVector3D(4.0f, 4.0f,  4.0f));
+    plan->transform.translate(QVector3D(-500, -10, -500.0));
+    plan->transform.scale(QVector3D(40.0f, 4.0f,  40.0f));
     QQuaternion j = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0), -90);
     plan->transform.rotate(j);
-    plan->transform.rotate(rotation);
+    //plan->transform.rotate(rotation);
 
     //Draw Plan
-    program.setUniformValue("mvp_matrix", projection * plan->transform.getMatrice());
+    program.setUniformValue("mvp_matrix", projection * plan->transform.getMatrice() * view);
     program.setUniformValue("texture", 0);
     plan->render(&program);
     //geometries->drawPlanGeometry(&program);
-
+    /*
     //chute et verif
     float vitGravite = 0.1;
     if(truc->getPos().at(2) > 1.0){
@@ -376,12 +364,13 @@ void MainWidget::paintGL()
     truc->transform.translate(translation);
 
     //Draw truc
+
     program.setUniformValue("mvp_matrix", projection * truc->transform.getMatrice());
     program.setUniformValue("texture", 0);
     truc->render(&program);
     //geometries->drawCubeGeometry(&program);
 
-
+    */
     //camera->render(&program);
 
     /*

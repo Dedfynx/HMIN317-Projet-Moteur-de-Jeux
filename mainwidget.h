@@ -99,6 +99,13 @@ private:
     QOpenGLTexture *texture;
 
     QMatrix4x4 projection;
+    QMatrix4x4 view;
+
+    QVector3D camPos;
+    QVector3D center;
+    QVector3D up;
+
+    float camSpeed;
 
     QVector2D mousePressPosition;
     QVector3D rotationAxis;
