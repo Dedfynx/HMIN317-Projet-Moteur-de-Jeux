@@ -171,27 +171,35 @@ void MainWidget::keyPressEvent(QKeyEvent *ev){
                 close();
                 break;
             case Qt::Key_Z :
-                translation.setY(translation.y() + 1);
-                update();
-                break;
-            case Qt::Key_Q :
-                translation.setX(translation.x() - 1);
-                update();
-                break;
-            case Qt::Key_S :
-                translation.setY(translation.y() - 1);
-                update();
-                break;
-            case Qt::Key_D :
-                translation.setX(translation.x() + 1);
-                update();
-                break;
-            case Qt::Key_Up:
                 translation.setZ(translation.z() + 1);
                 update();
                 break;
-            case Qt::Key_Down:
+            case Qt::Key_Q :
+                rotation = QQuaternion::fromAxisAndAngle(QVector3D(0,0,1), 0.5) * rotation;
+                update();
+                break;
+            case Qt::Key_S :
                 translation.setZ(translation.z() - 1);
+                update();
+                break;
+            case Qt::Key_D :
+                rotation = QQuaternion::fromAxisAndAngle(QVector3D(0,0,1), -0.5) * rotation;
+                update();
+                break;
+            case Qt::Key_Up:
+                translation.setY(translation.y() - 1);
+                update();
+                break;
+            case Qt::Key_Down:
+                translation.setY(translation.y() + 1);
+                update();
+                break;
+            case Qt::Key_Right:
+                translation.setX(translation.y() - 1);
+                update();
+                break;
+            case Qt::Key_Left:
+                translation.setX(translation.y() + 1);
                 update();
                 break;
             case Qt::Key_C :
