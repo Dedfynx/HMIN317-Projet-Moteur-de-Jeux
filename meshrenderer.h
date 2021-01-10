@@ -29,6 +29,7 @@ private:
 
 public:
 	MeshRenderer(const QString& filename);
+	MeshRenderer(float sizeX,float sizeY,float sizeZ); //boite
 
 	~MeshRenderer();
 

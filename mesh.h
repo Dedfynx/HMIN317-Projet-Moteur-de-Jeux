@@ -23,14 +23,15 @@ struct VertexData
 
 class Mesh{
 public:
-	//std::vector<VertexData> points;
-	std::vector<QVector3D> points;
+	std::vector<VertexData> points;
+	//std::vector<QVector3D> points;
 	std::vector<GLushort> triangles;
 
 public:
 	Mesh();
 	Mesh(const QString& filename);
-
+	Mesh(float sizeX,float sizeY,float sizeZ);
+	Mesh(float sizeX,float sizeY);
 };
 
 #endif // MESH_H

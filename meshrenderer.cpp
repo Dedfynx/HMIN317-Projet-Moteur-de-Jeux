@@ -36,6 +36,24 @@ MeshRenderer::MeshRenderer(const QString& filename): GameComponent(), indexBuf(Q
    	indexBuf.allocate(&mesh.triangles[0], nbIndices * sizeof(GLushort));
 }
 
+MeshRenderer::MeshRenderer(float sizeX,float sizeY,float sizeZ){
+
+	mesh=Mesh(sizeX,sizeY,sizeZ);
+	initializeOpenGLFunctions();
+
+	// Generate 2 VBOs
+   	arrayBuf.create();
+   	indexBuf.create();
+
+   	arrayBuf.bind();
+   	arrayBuf.allocate(&mesh.points[0], mesh.points.size() * sizeof(QVector3D));
+    	
+    nbIndices=mesh.triangles.size();
+    // Transfer index data to VBO 1
+   	indexBuf.bind();
+   	indexBuf.allocate(&mesh.triangles[0], nbIndices * sizeof(GLushort));
+}
+
 MeshRenderer::~MeshRenderer(){
    	arrayBuf.destroy();
    	indexBuf.destroy();
@@ -57,20 +75,19 @@ void MeshRenderer::render(QOpenGLShaderProgram *program){
    	arrayBuf.bind();
    	indexBuf.bind();
 
-    	// Tell OpenGL programmable pipeline how to locate vertex position data
+    // Tell OpenGL programmable pipeline how to locate vertex position data
    	int vertexLocation = program->attributeLocation("a_position");
    	program->enableAttributeArray(vertexLocation);
-   	program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(QVector3D));
+   	program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
 
-    	/*
-    	// Offset for texture coordinate
-    	offset += sizeof(QVector3D);
-    	// Tell OpenGL programmable pipeline how to locate vertex texture coordinate data
-    	int texcoordLocation = program->attributeLocation("a_texcoord");
-    	program->enableAttributeArray(texcoordLocation);
-    	program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
-    	*/
-
+   
+    // Offset for texture coordinate
+    offset += sizeof(QVector3D);
+    // Tell OpenGL programmable pipeline how to locate vertex texture coordinate data
+    int texcoordLocation = program->attributeLocation("a_texcoord");
+    program->enableAttributeArray(texcoordLocation);
+    program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
+    
     glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
    	glDrawElements(GL_TRIANGLES, nbIndices, GL_UNSIGNED_SHORT, 0);
 }
