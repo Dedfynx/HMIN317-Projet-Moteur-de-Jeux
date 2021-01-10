@@ -7,6 +7,7 @@ SOURCES += main.cpp \
     boundingbox.cpp \
     gamecomponent.cpp \
     gameobject.cpp \
+    mesh.cpp \
     meshrenderer.cpp \
     transform.cpp
 
@@ -15,11 +16,13 @@ SOURCES += \
     geometryengine.cpp
 
 HEADERS += \
+    BasicIO.h \
     boundingbox.h \
     gamecomponent.h \
     gameobject.h \
     mainwidget.h \
     geometryengine.h \
+    mesh.h \
     meshrenderer.h \
     transform.h
 

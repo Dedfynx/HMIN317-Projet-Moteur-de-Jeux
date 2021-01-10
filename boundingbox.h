@@ -10,9 +10,9 @@ public:
 
     ChangeBoundingBox(float x, float y, float z);
 
-    float SizeX;
-    float SizeY;
-    float SizeZ;
+    float sizeX;
+    float sizeY;
+    float sizeZ;
 };
 
 #endif // BOUNDINGBOX_H

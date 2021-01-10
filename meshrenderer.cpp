@@ -6,7 +6,7 @@
 #include <vector>
 using namespace std;
 
-#include "Transformation.h"
+#include "Transform.h"
 #include "Mesh.h"
 #include "GameComponent.h"
 
@@ -52,9 +52,6 @@ void MeshRenderer::update(){
 void MeshRenderer::render(QOpenGLShaderProgram *program){
     	// Offset for position
    	quintptr offset = 0;
-
-   	//NE FONCTIONNE PAS (fait disparaitre les objets)
-   	program->setUniformValue("mvp_matrix", projection * transformation.m);
 
    	// Tell OpenGL which VBOs to use
    	arrayBuf.bind();
