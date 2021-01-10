@@ -50,6 +50,9 @@
 
 #include "mainwidget.h"
 #include "transform.h"
+#include "GameComponent.h"
+#include "MeshRenderer.h"
+#include "iostream"
 
 #include <QMouseEvent>
 
@@ -65,14 +68,20 @@ MainWidget::MainWidget(QWidget *parent) :
     lune(),
     luneL(),
     plan(),
-    truc()
-
+    truc(),
+    planRenderer(),
+    trucRenderer()
 {
-    //init
+
+    //init scene graph
 
     camera = new GameObject();
     plan = new GameObject();
     truc = new GameObject();
+
+
+
+    std::cout<<"oui"<<std::endl;
 
     //camera.addEnfant(terre);
     camera->addEnfant(plan);
@@ -82,7 +91,7 @@ MainWidget::MainWidget(QWidget *parent) :
     terre.addEnfant(lune);
     lune.addEnfant(luneL);*/
 
-    plan->transform.translate(QVector3D(0, 0, -200.0));
+    plan->transform.translate(QVector3D(-15.0, -15.0, -200.0));
     plan->transform.translate(translation);
     plan->transform.scale(QVector3D(4.0f, 4.0f,  4.0f));
 
@@ -162,27 +171,27 @@ void MainWidget::keyPressEvent(QKeyEvent *ev){
                 close();
                 break;
             case Qt::Key_Z :
-                translation.setZ(translation.z() + 1);
-                update();
-                break;
-            case Qt::Key_Q :
-                rotation = QQuaternion::fromAxisAndAngle(QVector3D(0,0,1), 0.5) * rotation;
-                update();
-                break;
-            case Qt::Key_S :
-                translation.setZ(translation.z() - 1);
-                update();
-                break;
-            case Qt::Key_D :
-                rotation = QQuaternion::fromAxisAndAngle(QVector3D(0,0,1), -0.5) * rotation;
-                update();
-                break;
-            case Qt::Key_Up:
                 translation.setY(translation.y() + 1);
                 update();
                 break;
-            case Qt::Key_Down:
+            case Qt::Key_Q :
+                translation.setX(translation.x() - 1);
+                update();
+                break;
+            case Qt::Key_S :
                 translation.setY(translation.y() - 1);
+                update();
+                break;
+            case Qt::Key_D :
+                translation.setX(translation.x() + 1);
+                update();
+                break;
+            case Qt::Key_Up:
+                translation.setZ(translation.z() + 1);
+                update();
+                break;
+            case Qt::Key_Down:
+                translation.setZ(translation.z() - 1);
                 update();
                 break;
             case Qt::Key_C :
@@ -247,7 +256,12 @@ void MainWidget::initializeGL()
     glEnable(GL_CULL_FACE);
 //! [2]
 
-    geometries = new GeometryEngine;
+    //geometries = new GeometryEngine;
+
+    GameComponent* planRenderer=new MeshRenderer(30.0,30.0);
+    plan->addComponent(planRenderer);
+    GameComponent* trucRenderer=new MeshRenderer(1.0,1.0,1.0);
+    truc->addComponent(trucRenderer);
 
     // Use QBasicTimer because its faster than QTimer
     timer.start(12, this);
@@ -339,7 +353,8 @@ void MainWidget::paintGL()
     //Draw Plan
     program.setUniformValue("mvp_matrix", projection * plan->transform.getMatrice());
     program.setUniformValue("texture", 0);
-    geometries->drawPlanGeometry(&program);
+    plan->render(&program);
+    //geometries->drawPlanGeometry(&program);
 
     //chute et verif
     float vitGravite = 0.1;
@@ -355,7 +370,11 @@ void MainWidget::paintGL()
     //Draw truc
     program.setUniformValue("mvp_matrix", projection * truc->transform.getMatrice());
     program.setUniformValue("texture", 0);
-    geometries->drawCubeGeometry(&program);
+    truc->render(&program);
+    //geometries->drawCubeGeometry(&program);
+
+
+    //camera->render(&program);
 
     /*
     terre.transform.update(camera.transform.getMatrice());

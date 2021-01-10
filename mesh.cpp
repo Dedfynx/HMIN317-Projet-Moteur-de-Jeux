@@ -91,10 +91,10 @@ Mesh::Mesh(float sizeX,float sizeY,float sizeZ){
     // Vertex data for face 1
 	//face arriere
 
-    points.push_back({ QVector3D(0.0,-sizeY,0.0), QVector2D( 0.0f, 0.0f)}); // v4
-    points.push_back({ QVector3D(0.0,-sizeY,sizeZ), QVector2D(1.0f, 0.0f)}); // v5
-    points.push_back({ QVector3D(sizeX,-sizeY,sizeZ), QVector2D(1.0f, 1.0f)});  // v6
-    points.push_back({ QVector3D(sizeX,-sizeY,0.0), QVector2D(0.0f, 1.0f)}); // v7
+    points.push_back({ QVector3D(sizeX,-sizeY,0.0), QVector2D( 0.0f, 0.0f)}); // v4
+    points.push_back({ QVector3D(sizeX,-sizeY,sizeZ), QVector2D(1.0f, 0.0f)}); // v5
+    points.push_back({ QVector3D(0.0,-sizeY,sizeZ), QVector2D(1.0f, 1.0f)});  // v6
+    points.push_back({ QVector3D(0.0,-sizeY,0.0), QVector2D(0.0f, 1.0f)}); // v7
 
 	triangles.push_back(4);
 	triangles.push_back(5);

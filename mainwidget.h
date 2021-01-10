@@ -63,6 +63,8 @@
 #include <QOpenGLTexture>
 
 #include "gameobject.h"
+#include "GameComponent.h"
+#include "MeshRenderer.h"
 
 
 class GeometryEngine;
@@ -115,6 +117,9 @@ private:
     GameObject* plan;
     GameObject* truc;
 
+
+    GameComponent* planRenderer;
+    GameComponent* trucRenderer;
 };
 
 #endif // MAINWIDGET_H
