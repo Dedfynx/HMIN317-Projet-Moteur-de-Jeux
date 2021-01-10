@@ -4,8 +4,10 @@ TARGET = gameengine
 TEMPLATE = app
 
 SOURCES += main.cpp \
+    boundingbox.cpp \
     gamecomponent.cpp \
     gameobject.cpp \
+    meshrenderer.cpp \
     transform.cpp
 
 SOURCES += \
@@ -13,10 +15,12 @@ SOURCES += \
     geometryengine.cpp
 
 HEADERS += \
+    boundingbox.h \
     gamecomponent.h \
     gameobject.h \
     mainwidget.h \
     geometryengine.h \
+    meshrenderer.h \
     transform.h
 
 RESOURCES += \

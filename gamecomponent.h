@@ -22,7 +22,7 @@ public:
 
     void virtual update();
 
-    void virtual render();
+    void virtual render(QOpenGLShaderProgram *program);
 };
 
 #endif // GAMECOMPONENT_H

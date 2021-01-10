@@ -18,7 +18,7 @@ private:
 public:
     GameObject();
     void update();
-    void render();
+    void render(QOpenGLShaderProgram *program);
 
     void addEnfant(GameObject* enfant);
     void addComponent(GameComponent* c);

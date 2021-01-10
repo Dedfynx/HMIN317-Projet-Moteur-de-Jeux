@@ -21,13 +21,13 @@ void GameObject::update(){
     }
 }
 
-void GameObject::render(){
+void GameObject::render(QOpenGLShaderProgram *program){
     for(GameObject* enfant : enfants){
-        enfant->render();
+        enfant->render(program);
     }
 
     for(GameComponent* component : components){
-        component->render();
+        component->render(program);
     }
 }
 
