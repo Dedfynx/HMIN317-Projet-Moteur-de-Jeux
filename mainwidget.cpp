@@ -79,7 +79,7 @@ MainWidget::MainWidget(QWidget *parent) :
     plan = new GameObject();
     truc = new GameObject();
 
-    camPos = QVector3D(0.0f,-10.0f,20.0f);
+    camPos = QVector3D(0.0f,0.0f,0.0f);
     center = QVector3D(0.0f,0.0f,0.0f),up = QVector3D(0.0f,1.0f,0.0f);
     camSpeed = 0.05f;
 
