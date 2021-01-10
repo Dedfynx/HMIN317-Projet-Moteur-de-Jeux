@@ -1,28 +1,42 @@
 #include "gameobject.h"
+#include "gameComponent.h"
 
-GameObject::GameObject()
-{
+GameObject::GameObject(){
+
+    enfants = std::vector<GameObject*>();
+    components = std::vector<GameComponent*>();
+    transform = Transform();
+
     position.resize(3);
 }
 
 void GameObject::update(){
-
-    for(unsigned int i = 0;i<enfants.size();i++){
-        enfants[i].transform.update(transform.getMatrice());
-        enfants[i].update();
+    for(GameObject* enfant : enfants){
+        enfant->transform.update(transform.getMatrice());
+        enfant->update();
     }
 
+    for(GameComponent* component : components){
+        component->update();
+    }
 }
+
 void GameObject::render(){
-
-    for(unsigned int i = 0;i<enfants.size();i++){
-        enfants[i].render();
+    for(GameObject* enfant : enfants){
+        enfant->render();
     }
 
+    for(GameComponent* component : components){
+        component->render();
+    }
 }
 
-void  GameObject::addEnfant(GameObject enfant){
+void  GameObject::addEnfant(GameObject* enfant){
     enfants.push_back(enfant);
+}
+
+void GameObject::addComponent(GameComponent* c){
+    components.push_back(c);
 }
 
 

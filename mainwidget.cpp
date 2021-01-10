@@ -69,23 +69,28 @@ MainWidget::MainWidget(QWidget *parent) :
 
 {
     //init
-    //camera.addEnfant(terre);
-    camera.addEnfant(plan);
 
-    plan.addEnfant(truc);
+    camera = new GameObject();
+    plan = new GameObject();
+    truc = new GameObject();
+
+    //camera.addEnfant(terre);
+    camera->addEnfant(plan);
+
+    plan->addEnfant(truc);
     /*
     terre.addEnfant(lune);
     lune.addEnfant(luneL);*/
 
-    plan.transform.translate(QVector3D(0, 0, -200.0));
-    plan.transform.translate(translation);
-    plan.transform.scale(QVector3D(4.0f, 4.0f,  4.0f));
+    plan->transform.translate(QVector3D(0, 0, -200.0));
+    plan->transform.translate(translation);
+    plan->transform.scale(QVector3D(4.0f, 4.0f,  4.0f));
 
-    truc.setPos(20.0,20.0,20.0);
-    truc.transform.update(plan.transform.getMatrice());
-    truc.transform.translate(QVector3D(truc.getPos().at(0),truc.getPos().at(1),truc.getPos().at(2)));
-    truc.transform.translate(translation);
-    //truc.transform.scale(QVector3D(4.0f, 4.0f,  4.0f));
+    truc->setPos(20.0,20.0,20.0);
+    truc->transform.update(plan->transform.getMatrice());
+    truc->transform.translate(QVector3D(truc->getPos().at(0),truc->getPos().at(1),truc->getPos().at(2)));
+    truc->transform.translate(translation);
+    //truc->transform.scale(QVector3D(4.0f, 4.0f,  4.0f));
 
 
     /*
@@ -316,39 +321,39 @@ void MainWidget::paintGL()
     QMatrix4x4 matrix;
     //translate Camera
 
-    camera.transform.translate(translation);
+    camera->transform.translate(translation);
     translation.setX(0);
     translation.setY(0);
     translation.setZ(0);
 
     QQuaternion r = QQuaternion::fromAxisAndAngle(QVector3D(0,1,0), 5) * rotation;
 
-    plan.transform.update(camera.transform.getMatrice());
+    plan->transform.update(camera->transform.getMatrice());
 
-    plan.transform.translate(QVector3D(-50, -10, -200.0));
-    plan.transform.scale(QVector3D(4.0f, 4.0f,  4.0f));
+    plan->transform.translate(QVector3D(-50, -10, -200.0));
+    plan->transform.scale(QVector3D(4.0f, 4.0f,  4.0f));
     QQuaternion j = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0), -90);
-    plan.transform.rotate(j);
-    plan.transform.rotate(rotation);
+    plan->transform.rotate(j);
+    plan->transform.rotate(rotation);
 
     //Draw Plan
-    program.setUniformValue("mvp_matrix", projection * plan.transform.getMatrice());
+    program.setUniformValue("mvp_matrix", projection * plan->transform.getMatrice());
     program.setUniformValue("texture", 0);
     geometries->drawPlanGeometry(&program);
 
     //chute et verif
     float vitGravite = 0.1;
-    if(truc.getPos().at(2) > 1.0){
-        truc.setPos(truc.getPos().at(0),truc.getPos().at(1),truc.getPos().at(2)-vitGravite);
+    if(truc->getPos().at(2) > 1.0){
+        truc->setPos(truc->getPos().at(0),truc->getPos().at(1),truc->getPos().at(2)-vitGravite);
     }
 
 
-    truc.transform.update(plan.transform.getMatrice());
-    truc.transform.translate(QVector3D(truc.getPos().at(0),truc.getPos().at(1),truc.getPos().at(2)));
-    truc.transform.translate(translation);
+    truc->transform.update(plan->transform.getMatrice());
+    truc->transform.translate(QVector3D(truc->getPos().at(0),truc->getPos().at(1),truc->getPos().at(2)));
+    truc->transform.translate(translation);
 
     //Draw truc
-    program.setUniformValue("mvp_matrix", projection * truc.transform.getMatrice());
+    program.setUniformValue("mvp_matrix", projection * truc->transform.getMatrice());
     program.setUniformValue("texture", 0);
     geometries->drawCubeGeometry(&program);
 

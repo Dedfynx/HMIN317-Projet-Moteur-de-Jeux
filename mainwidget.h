@@ -106,14 +106,14 @@ private:
     QVector3D translation;
 
     //tp3
-    GameObject camera;
-    GameObject terre;
-    GameObject lune;
-    GameObject luneL;
+    GameObject* camera;
+    GameObject* terre;
+    GameObject* lune;
+    GameObject* luneL;
 
     //tp4 mouvement
-    GameObject plan;
-    GameObject truc;
+    GameObject* plan;
+    GameObject* truc;
 
 };
 
