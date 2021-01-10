@@ -147,40 +147,38 @@ void MainWidget::keyPressEvent(QKeyEvent *ev){
                 break;
             case Qt::Key_Z :
                 //translation.setZ(translation.z() + 1);
-                camPos += QVector3D(0.0,0.0,0.1);
-                view.lookAt(camPos,center,up);
+                view.translate(0,0,0.1);
                 update();
                 break;
             case Qt::Key_Q :
-                rotation = QQuaternion::fromAxisAndAngle(QVector3D(0,1,0), 0.5) * rotation;
+                view.rotate(-1.0,QVector3D(0.0,0.0,1.0));
                 update();
                 break;
             case Qt::Key_S :
                 //translation.setZ(translation.z() - 1);
-                camPos -= QVector3D(0.0,0.0,0.1);
-                view.lookAt(camPos,center,up);
+                view.translate(0,0,-0.1);
+                //view.lookAt(camPos,center,up);
                 update();
                 break;
             case Qt::Key_D :
-                rotation = QQuaternion::fromAxisAndAngle(QVector3D(0,1,0), -0.5) * rotation;
+                view.rotate(1.0,QVector3D(0.0,0.0,1.0));
+
                 update();
                 break;
             case Qt::Key_Up:
-                translation.setY(translation.y() - 1);
+                view.translate(0,0.1,0);
                 update();
                 break;
             case Qt::Key_Down:
-                translation.setY(translation.y() + 1);
+                view.translate(0,-0.1,0);
                 update();
                 break;
             case Qt::Key_Right:
-                camPos += center * camSpeed;
-                view.lookAt(camPos,center,up);
+                view.translate(0.1,0,0);
                 update();
                 break;
             case Qt::Key_Left:
-                camPos.setX(camPos.x() - 0.1f);
-                view.lookAt(camPos,center,up);
+                view.translate(-0.1,0,0);
                 update();
                 break;
             case Qt::Key_C :
