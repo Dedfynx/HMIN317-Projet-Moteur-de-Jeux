@@ -168,7 +168,12 @@ void MainWidget::keyPressEvent(QKeyEvent *ev){
                 close();
                 break;
             case Qt::Key_Z :
-                translation.setZ(translation.z() - 1);
+
+                translation.setX(translation.x() - view.column(2).x());
+                translation.setY(translation.y() - view.column(2).y());
+                translation.setZ(translation.z() + view.column(2).z());
+                
+                //translation.setZ(translation.z() - 1);
                 //view.translate(0,0,-0.1);
                 //camPos.setZ(camPos.z()-0.1);
                 update();
@@ -179,7 +184,12 @@ void MainWidget::keyPressEvent(QKeyEvent *ev){
                 update();
                 break;
             case Qt::Key_S :
-                translation.setZ(translation.z() + 1);
+
+                translation.setX(translation.x() + view.column(2).x());
+                translation.setY(translation.y() + view.column(2).y());
+                translation.setZ(translation.z() - view.column(2).z());
+
+                //translation.setZ(translation.z() + 1);
                 //view.translate(0,0,0.1);
                 //view.lookAt(camPos,center,up);
                 //camPos.setZ(camPos.z()+0.1);
@@ -191,25 +201,45 @@ void MainWidget::keyPressEvent(QKeyEvent *ev){
                 update();
                 break;
             case Qt::Key_Up:
-                translation.setY(translation.y() + 1);
+
+                translation.setX(translation.x() - view.column(1).x());
+                translation.setY(translation.y() - view.column(1).y());
+                translation.setZ(translation.z() + view.column(1).z());
+
+                //translation.setY(translation.y() + 1);
                 //view.translate(0,0.1,0);
                 //camPos.setY(camPos.y()+0.1);
                 update();
                 break;
             case Qt::Key_Down:
-                translation.setY(translation.y() - 1);
+
+                translation.setX(translation.x() + view.column(1).x());
+                translation.setY(translation.y() + view.column(1).y());
+                translation.setZ(translation.z() - view.column(1).z());
+
+                //translation.setY(translation.y() - 1);
                 //view.translate(0,-0.1,0);
                 //camPos.setY(camPos.y()-0.1);
                 update();
                 break;
             case Qt::Key_Right:
-                translation.setX(translation.x() + 1);
+                
+                translation.setX(translation.x() - view.column(0).x());
+                translation.setY(translation.y() - view.column(0).y());
+                translation.setZ(translation.z() + view.column(0).z());
+
+                //translation.setX(translation.x() + 1);
                 //view.translate(0.1,0,0);
                 //camPos.setX(camPos.x()+0.1);
                 update();
                 break;
             case Qt::Key_Left:
-                translation.setY(translation.y() - 1);
+
+                translation.setX(translation.x() + view.column(0).x());
+                translation.setY(translation.y() + view.column(0).y());
+                translation.setZ(translation.z() - view.column(0).z());
+
+                //translation.setX(translation.x() - 1);
                 //view.translate(-0.1,0,0);
                 //camPos.setX(camPos.x()-0.1);
                 update();
@@ -386,8 +416,8 @@ void MainWidget::paintGL()
    
 
     //camPos = QVector3D(0,0,0);
-    std::cout << camPos.x() << " " << camPos.y() << " " << camPos.z() << std::endl;
-    std::cout << "pitch :"<<pitch<<" , yaw :"<<yaw<<std::endl;
+    //std::cout << camPos.x() << " " << camPos.y() << " " << camPos.z() << std::endl;
+    //std::cout << "pitch :"<<pitch<<" , yaw :"<<yaw<<std::endl;
 
     camera->transform.rotate(rotation);
     rotation = QQuaternion::fromAxisAndAngle(QVector3D(0,0,0), 0);
