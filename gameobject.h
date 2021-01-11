@@ -18,12 +18,13 @@ private:
 public:
     GameObject();
     void update();
-    void render(QOpenGLShaderProgram *program);
+    void render(QOpenGLShaderProgram *program,QMatrix4x4 proj, QMatrix4x4 view);
 
     void addEnfant(GameObject* enfant);
     void addComponent(GameComponent* c);
 
     Transform transform;
+    Transform localTransform;
 
     std::vector<float> getPos();
     void setPos(float x,float y,float z);

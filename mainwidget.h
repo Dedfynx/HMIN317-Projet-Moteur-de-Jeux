@@ -118,14 +118,13 @@ private:
     QVector3D translation;
 
     //tp3
+    GameObject* root;
     GameObject* camera;
-    GameObject* terre;
-    GameObject* lune;
-    GameObject* luneL;
 
     //tp4 mouvement
     GameObject* plan;
     GameObject* truc;
+    GameObject* cube2;
 
 
     GameComponent* planRenderer;

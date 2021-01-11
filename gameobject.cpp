@@ -6,13 +6,14 @@ GameObject::GameObject(){
     enfants = std::vector<GameObject*>();
     components = std::vector<GameComponent*>();
     transform = Transform();
+    localTransform = Transform();
 
     position.resize(3);
 }
 
 void GameObject::update(){
     for(GameObject* enfant : enfants){
-        enfant->transform.update(transform.getMatrice());
+        enfant->transform.update(transform.getMatrice() * enfant->localTransform.getMatrice());
         enfant->update();
     }
 
@@ -21,13 +22,14 @@ void GameObject::update(){
     }
 }
 
-void GameObject::render(QOpenGLShaderProgram *program){
+void GameObject::render(QOpenGLShaderProgram *program, QMatrix4x4 proj, QMatrix4x4 view){
     for(GameObject* enfant : enfants){
-        enfant->render(program);
+        enfant->render(program,proj,view);
     }
 
+    QMatrix4x4 mvp=proj * view * transform.getMatrice();
     for(GameComponent* component : components){
-        component->render(program);
+        component->render(program,mvp);
     }
 }
 

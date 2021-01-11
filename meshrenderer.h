@@ -38,7 +38,7 @@ public:
 
     void virtual update();
 
-	void virtual render(QOpenGLShaderProgram *program);
+	void virtual render(QOpenGLShaderProgram *program,QMatrix4x4 mvp);
 };
 
 #endif // MESHRENDERER_H

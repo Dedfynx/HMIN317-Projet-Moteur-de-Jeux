@@ -88,7 +88,11 @@ void MeshRenderer::update(){
 
 }
 
-void MeshRenderer::render(QOpenGLShaderProgram *program){
+void MeshRenderer::render(QOpenGLShaderProgram *program,QMatrix4x4 mvp){
+
+
+	program->setUniformValue("mvp_matrix",mvp);
+    program->setUniformValue("texture", 0);
 
    	// Offset for position
    	quintptr offset = 0;

@@ -24,6 +24,6 @@ void GameComponent::update(){
 	perror("Must not happen !");
 }
 
-void GameComponent::render(QOpenGLShaderProgram *program){
+void GameComponent::render(QOpenGLShaderProgram *program,QMatrix4x4 mvp){
 	perror("Must not happen !");
 }
