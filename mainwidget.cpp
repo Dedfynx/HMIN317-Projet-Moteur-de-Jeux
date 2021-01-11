@@ -83,23 +83,45 @@ MainWidget::MainWidget(QWidget *parent) :
     center = QVector3D(0.0f,0.0f,0.0f),up = QVector3D(0.0f,1.0f,0.0f);
     camSpeed = 0.05f;
 
-    view.lookAt(camPos,center,up);
 
-    std::cout<<"oui"<<std::endl;
+    //view matrix
+
+    yaw=0.0;
+    pitch=0.0;
+    // I assume the values are already converted to radians.
+    float cosPitch = cos(pitch);
+    float sinPitch = sin(pitch);
+    float cosYaw = cos(yaw);
+    float sinYaw = sin(yaw);
+ 
+    QVector3D xaxis = QVector3D(cosYaw, 0, -sinYaw );
+    QVector3D yaxis = QVector3D( sinYaw * sinPitch, cosPitch, cosYaw * sinPitch );
+    QVector3D zaxis = QVector3D( sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw );
+ 
+    // Create a 4x4 view matrix from the right, up, forward and eye position vectors
+    view = QMatrix4x4(
+        xaxis.x(),            yaxis.x(),            zaxis.x(), 0,
+        xaxis.y(),            yaxis.y(),            zaxis.y(), 0,
+        xaxis.z(),            yaxis.z(),            zaxis.z(), 0,
+       -QVector3D::dotProduct( xaxis, camPos ), -QVector3D::dotProduct( yaxis, camPos ), -QVector3D::dotProduct( zaxis, camPos ), 1
+    );
+    ///////////////
+
+    //view.lookAt(camPos,center,up);
 
     camera->addEnfant(plan);
 
     plan->addEnfant(truc);
 
-
-    plan->transform.translate(QVector3D(-15.0, -15.0, -200.0));
-    plan->transform.translate(translation);
     plan->transform.scale(QVector3D(4.0f, 4.0f,  4.0f));
+    plan->transform.translate(QVector3D(-15.0, -15.0, -200.0));
+    //plan->transform.translate(translation);
+ 
 
     truc->setPos(20.0,20.0,20.0);
     truc->transform.update(plan->transform.getMatrice());
     truc->transform.translate(QVector3D(truc->getPos().at(0),truc->getPos().at(1),truc->getPos().at(2)));
-    truc->transform.translate(translation);
+    //truc->transform.translate(translation);
 
 }
 
@@ -146,39 +168,50 @@ void MainWidget::keyPressEvent(QKeyEvent *ev){
                 close();
                 break;
             case Qt::Key_Z :
-                //translation.setZ(translation.z() + 1);
-                view.translate(0,0,0.1);
+                translation.setZ(translation.z() - 1);
+                //view.translate(0,0,-0.1);
+                //camPos.setZ(camPos.z()-0.1);
                 update();
                 break;
             case Qt::Key_Q :
-                view.rotate(-1.0,QVector3D(0.0,0.0,1.0));
+                //view.rotate(-1.0,QVector3D(0.0,1.0,0.0));
+                yaw-=0.1;
                 update();
                 break;
             case Qt::Key_S :
-                //translation.setZ(translation.z() - 1);
-                view.translate(0,0,-0.1);
+                translation.setZ(translation.z() + 1);
+                //view.translate(0,0,0.1);
                 //view.lookAt(camPos,center,up);
+                //camPos.setZ(camPos.z()+0.1);
                 update();
                 break;
             case Qt::Key_D :
-                view.rotate(1.0,QVector3D(0.0,0.0,1.0));
-
+                //view.rotate(1.0,QVector3D(0.0,1.0,0.0));
+                yaw+=0.1;
                 update();
                 break;
             case Qt::Key_Up:
-                view.translate(0,0.1,0);
+                translation.setY(translation.y() + 1);
+                //view.translate(0,0.1,0);
+                //camPos.setY(camPos.y()+0.1);
                 update();
                 break;
             case Qt::Key_Down:
-                view.translate(0,-0.1,0);
+                translation.setY(translation.y() - 1);
+                //view.translate(0,-0.1,0);
+                //camPos.setY(camPos.y()-0.1);
                 update();
                 break;
             case Qt::Key_Right:
-                view.translate(0.1,0,0);
+                translation.setX(translation.x() + 1);
+                //view.translate(0.1,0,0);
+                //camPos.setX(camPos.x()+0.1);
                 update();
                 break;
             case Qt::Key_Left:
-                view.translate(-0.1,0,0);
+                translation.setY(translation.y() - 1);
+                //view.translate(-0.1,0,0);
+                //camPos.setX(camPos.x()-0.1);
                 update();
                 break;
             case Qt::Key_C :
@@ -300,7 +333,7 @@ void MainWidget::resizeGL(int w, int h)
     qreal aspect = qreal(w) / qreal(h ? h : 1);
 
     // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
-    const qreal zNear = 3.0, zFar = 500.0, fov = 45.0;
+    const qreal zNear = 1.0, zFar = 500.0, fov = 45.0;
 
     // Reset projection
     projection.setToIdentity();
@@ -324,30 +357,66 @@ void MainWidget::paintGL()
     QMatrix4x4 matrix;
     //translate Camera
 
-    camera->transform.translate(translation);
+
+
+    //view matrix
+
+    // I assume the values are already converted to radians.
+    float cosPitch = cos(pitch);
+    float sinPitch = sin(pitch);
+    float cosYaw = cos(yaw);
+    float sinYaw = sin(yaw);
+ 
+    QVector3D xaxis = { cosYaw, 0, -sinYaw };
+    QVector3D yaxis = { sinYaw * sinPitch, cosPitch, cosYaw * sinPitch };
+    QVector3D zaxis = { sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw };
+ 
+    // Create a 4x4 view matrix from the right, up, forward and eye position vectors
+    view = QMatrix4x4(
+        xaxis.x(),            yaxis.x(),            zaxis.x(), 0,
+        xaxis.y(),            yaxis.y(),            zaxis.y(), 0,
+        xaxis.z(),            yaxis.z(),            zaxis.z(), 0,
+       -QVector3D::dotProduct( xaxis, camPos ), -QVector3D::dotProduct(yaxis, camPos), -QVector3D::dotProduct(zaxis, camPos), 1
+    );
+
+    ///////////////
+
+    view.translate(translation);
+
+   
 
     //camPos = QVector3D(0,0,0);
     std::cout << camPos.x() << " " << camPos.y() << " " << camPos.z() << std::endl;
+    std::cout << "pitch :"<<pitch<<" , yaw :"<<yaw<<std::endl;
 
     camera->transform.rotate(rotation);
     rotation = QQuaternion::fromAxisAndAngle(QVector3D(0,0,0), 0);
-    translation.setX(0);
-    translation.setY(0);
-    translation.setZ(0);
+
+    //camera->transform.translate(translation);
+
+    //translation.setX(0);
+    //translation.setY(0);
+    //translation.setZ(0);
 
 
     plan->transform.update(camera->transform.getMatrice());
 
-    plan->transform.translate(QVector3D(-500, -10, -500.0));
-    plan->transform.scale(QVector3D(40.0f, 4.0f,  40.0f));
+    plan->transform.scale(QVector3D(4.0f, 4.0f,  4.0f));
+    plan->transform.translate(QVector3D(-15, -3, -10.0));
     QQuaternion j = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0), -90);
     plan->transform.rotate(j);
+
+ 
+
+
     //plan->transform.rotate(rotation);
 
     //Draw Plan
-    program.setUniformValue("mvp_matrix", projection * plan->transform.getMatrice() * view);
+    program.setUniformValue("mvp_matrix",projection * view * plan->transform.getMatrice());
     program.setUniformValue("texture", 0);
     plan->render(&program);
+
+
     //geometries->drawPlanGeometry(&program);
     /*
     //chute et verif
@@ -371,38 +440,4 @@ void MainWidget::paintGL()
     */
     //camera->render(&program);
 
-    /*
-    terre.transform.update(camera.transform.getMatrice());
-    //reset de la position initiale terre
-    terre.transform.translate(QVector3D(0, 0, -200.0));
-    terre.transform.scale(QVector3D(4.0f, 4.0f,  4.0f));
-
-    //rotation
-
-    terre.transform.rotate(r);
-    //update de la matrice de la lune avant les 23 degree
-    lune.transform.update(terre.transform.getMatrice());
-    QQuaternion ergertgezrg = QQuaternion::fromAxisAndAngle(QVector3D(0,0,1), 23) * rotation;
-    terre.transform.rotate(ergertgezrg);
-
-    //Draw Terre
-    program.setUniformValue("mvp_matrix", projection * terre.transform.getMatrice());
-    program.setUniformValue("texture", 0);
-    geometries->drawCubeGeometry(&program);
-
-    //reset position lune
-    lune.transform.translate(QVector3D(20,0,0));
-    lune.transform.scale(QVector3D(0.30f, 0.30f,  0.30f));
-    lune.transform.rotate(r);
-    lune.update();
-    //Draw lune
-    program.setUniformValue("mvp_matrix", projection * lune.transform.getMatrice());
-    geometries->drawCubeGeometry(&program);
-
-    luneL.transform.update(lune.transform.getMatrice());
-    luneL.transform.translate(QVector3D(20,0,0));
-    luneL.transform.scale(QVector3D(0.30f, 0.30f,  0.30f));
-    program.setUniformValue("mvp_matrix", projection * luneL.transform.getMatrice());
-    geometries->drawCubeGeometry(&program);
-    */
 }

@@ -107,6 +107,9 @@ private:
 
     float camSpeed;
 
+    float pitch;
+    float yaw;
+
     QVector2D mousePressPosition;
     QVector3D rotationAxis;
     qreal angularSpeed;
