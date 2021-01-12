@@ -8,8 +8,6 @@ GameObject::GameObject(){
     components = std::vector<GameComponent*>();
     transform = Transform();
     localTransform = Transform();
-
-    position.resize(3);
 }
 
 void GameObject::update(){
@@ -38,18 +36,27 @@ void  GameObject::addEnfant(GameObject* enfant){
     enfants.push_back(enfant);
 }
 
+
+
 void GameObject::addComponent(GameComponent* c){
     components.push_back(c);
 }
 
+void GameObject::removeEnfant(GameObject *enfant){
+    std::vector<GameObject*>::iterator it = std::find(enfants.begin(),enfants.end(),enfant);
+
+    if(it != enfants.end()){
+        enfants.erase(it);
+    }
+}
 
 //////////////////////////////////////////
-std::vector<float> GameObject::getPos(){
+QVector3D GameObject::getPos(){
     return position;
 }
 void GameObject::setPos(float x,float y,float z){
-    position.at(0) = x;
-    position.at(1) = y;
-    position.at(2) = z;
+    position.setX(x);
+    position.setY(y);
+    position.setZ(z);
 
 }

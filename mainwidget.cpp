@@ -121,8 +121,11 @@ MainWidget::MainWidget(QWidget *parent) :
     truc = new GameObject();    listGameObject.push_back(truc);
     cube2 = new GameObject();   listGameObject.push_back(cube2);
 
+    player = new GameObject();
+    player->BB.changeBoundingBox(5.0,10.0,5.0);
+
     cube2->BB.changeBoundingBox(5.0,5.0,5.0);
-    cube2->BB.changeBoundingBox(30.0,30.0,-1.0);
+    plan->BB.changeBoundingBox(30.0,30.0,-1.0);
     truc->BB.changeBoundingBox(1.0,1.0,-1.0);
     camera->BB.changeBoundingBox(0.5,-0.5,0.5);
 
@@ -154,7 +157,7 @@ MainWidget::MainWidget(QWidget *parent) :
         xaxis.x(),            yaxis.x(),            zaxis.x(), 0,
         xaxis.y(),            yaxis.y(),            zaxis.y(), 0,
         xaxis.z(),            yaxis.z(),            zaxis.z(), 0,
-       -QVector3D::dotProduct( xaxis, camPos ), -QVector3D::dotProduct( yaxis, camPos ), -QVector3D::dotProduct( zaxis, camPos ), 1
+       -QVector3D::dotProduct( xaxis, center ), -QVector3D::dotProduct( yaxis, center ), -QVector3D::dotProduct( zaxis, center ), 1
     );
     ///////////////
 
@@ -176,9 +179,10 @@ MainWidget::MainWidget(QWidget *parent) :
     QQuaternion j = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0), -90);
     plan->localTransform.rotate(j);
  
-    truc->localTransform.translate(QVector3D(10.0,-10.0,10.0));
+    truc->localTransform.translate(QVector3D(10.0,0.0,10.0));
 
     cube2->localTransform.translate(QVector3D(10.0,0.0,10.0));
+    cube2->setPos(10.0,0.0,-10.0);
 
 }
 
@@ -237,11 +241,14 @@ void MainWidget::timerEvent(QTimerEvent *)
         translation.setX(translation.x() - view.column(2).x());
         translation.setY(translation.y() - view.column(2).y());
         translation.setZ(translation.z() + view.column(2).z());
+        camPos += QVector3D(view.column(2).x(),view.column(2).y(),view.column(2).z());
     }
     if(pressedKeys.contains(Qt::Key_S)){
         translation.setX(translation.x() + view.column(2).x());
         translation.setY(translation.y() + view.column(2).y());
         translation.setZ(translation.z() - view.column(2).z());
+        camPos -= QVector3D(view.column(2).x(),0,view.column(2).z());
+
     }
     if(pressedKeys.contains(Qt::Key_Q)){
         yaw-=0.1;
@@ -254,12 +261,18 @@ void MainWidget::timerEvent(QTimerEvent *)
             inJump = true;
         }
     }
-
+    if(pressedKeys.contains(Qt::Key_A)){
+        root->removeEnfant(cube2);
+    }
+    std::cout << "Cam Pos: "<< camPos.x() << " " << camPos.y() << " " << camPos.z() << std::endl;
     if(inJump){
         inAir = true;
+
         translation.setX(translation.x() - view.column(1).x());
         translation.setY(translation.y() - view.column(1).y());
         translation.setZ(translation.z() + view.column(1).z());
+
+        camPos += QVector3D(view.column(1).x(),view.column(1).y(),view.column(1).z());
 
         cptSaut --;
         if(cptSaut <= 0){
@@ -269,18 +282,25 @@ void MainWidget::timerEvent(QTimerEvent *)
     }
     else{
         if(inAir){
+
             translation.setX(translation.x() + view.column(1).x());
             translation.setY(translation.y() + view.column(1).y());
             translation.setZ(translation.z() - view.column(1).z());
-            /*
-            if(translation.y() <= 0){
+
+            camPos -= QVector3D(0,view.column(1).y(),0);
+
+
+            if(camPos.y() <= 0){
                 inAir = false;
             }
-            */
+
+
         }
 
     }
-
+    if(collision(cube2->getPos(),cube2->BB,camPos,player->BB)){
+        root->removeEnfant(cube2);
+    }
     //
     // Decrease angular speed (friction)
     angularSpeed *= 0.99;
@@ -414,7 +434,7 @@ void MainWidget::paintGL()
         xaxis.x(),            yaxis.x(),            zaxis.x(), 0,
         xaxis.y(),            yaxis.y(),            zaxis.y(), 0,
         xaxis.z(),            yaxis.z(),            zaxis.z(), 0,
-       -QVector3D::dotProduct( xaxis, camPos ), -QVector3D::dotProduct(yaxis, camPos), -QVector3D::dotProduct(zaxis, camPos), 1
+       -QVector3D::dotProduct( xaxis, center ), -QVector3D::dotProduct(yaxis, center), -QVector3D::dotProduct(zaxis, center), 1
     );
 
     view.translate(translation);

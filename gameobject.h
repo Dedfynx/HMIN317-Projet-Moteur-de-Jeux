@@ -14,7 +14,7 @@ private:
     std::vector<GameComponent*> components;
 
     //temporaire
-    std::vector<float> position;
+    QVector3D position;
 
 public:
     GameObject();
@@ -23,13 +23,14 @@ public:
 
     void addEnfant(GameObject* enfant);
     void addComponent(GameComponent* c);
+    void removeEnfant(GameObject* enfant);
 
     Transform transform;
     Transform localTransform;
 
     BoundingBox BB;
 
-    std::vector<float> getPos();
+    QVector3D getPos();
     void setPos(float x,float y,float z);
 
 };
