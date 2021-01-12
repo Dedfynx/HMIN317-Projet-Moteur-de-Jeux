@@ -128,6 +128,7 @@ private:
     GameObject* plan;
     GameObject* truc;
     GameObject* cube2;
+    GameObject* mur;
     GameObject* player;
 
 

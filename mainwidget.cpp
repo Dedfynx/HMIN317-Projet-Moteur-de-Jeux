@@ -120,14 +120,17 @@ MainWidget::MainWidget(QWidget *parent) :
     plan = new GameObject();    listGameObject.push_back(plan);
     truc = new GameObject();    listGameObject.push_back(truc);
     cube2 = new GameObject();   listGameObject.push_back(cube2);
+    mur = new GameObject();
 
     player = new GameObject();
     player->BB.changeBoundingBox(5.0,10.0,5.0);
 
     cube2->BB.changeBoundingBox(5.0,5.0,5.0);
-    plan->BB.changeBoundingBox(30.0,30.0,-1.0);
+    plan->BB.changeBoundingBox(3*50.0,1.0,3*50.0);
     truc->BB.changeBoundingBox(1.0,1.0,-1.0);
     camera->BB.changeBoundingBox(0.5,-0.5,0.5);
+
+    mur->BB.changeBoundingBox(5,20,50);
 
     camPos = QVector3D(0.0f,0.0f,0.0f);
     center = QVector3D(0.0f,0.0f,0.0f),up = QVector3D(0.0f,1.0f,0.0f);
@@ -169,6 +172,7 @@ MainWidget::MainWidget(QWidget *parent) :
     root->addEnfant(camera);
     root->addEnfant(plan);
     root->addEnfant(cube2);
+    root->addEnfant(mur);
 
     plan->addEnfant(truc);
 
@@ -178,11 +182,15 @@ MainWidget::MainWidget(QWidget *parent) :
     plan->localTransform.translate(QVector3D(-15.0, -3.0, -10.0));
     QQuaternion j = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0), -90);
     plan->localTransform.rotate(j);
+    plan->setPos(-70,0,-70);
  
     truc->localTransform.translate(QVector3D(10.0,0.0,10.0));
 
     cube2->localTransform.translate(QVector3D(10.0,0.0,10.0));
     cube2->setPos(10.0,0.0,-10.0);
+
+    mur->localTransform.translate(QVector3D(50,8,20));
+    mur->setPos(50,0,-70);
 
 }
 
@@ -238,16 +246,34 @@ void MainWidget::timerEvent(QTimerEvent *)
     //gestion touche
 
     if(pressedKeys.contains(Qt::Key_Z)){
-        translation.setX(translation.x() - view.column(2).x());
-        translation.setY(translation.y() - view.column(2).y());
-        translation.setZ(translation.z() + view.column(2).z());
-        camPos += QVector3D(view.column(2).x(),view.column(2).y(),view.column(2).z());
+        if(collision(mur->getPos(),mur->BB,camPos,player->BB)){
+            translation.setX(translation.x() + 1.5*view.column(2).x());
+            translation.setY(translation.y() + 1.5*view.column(2).y());
+            translation.setZ(translation.z() - 1.5*view.column(2).z());
+            camPos -= QVector3D(1.5*view.column(2).x(),1.5*view.column(2).y(),1.5*view.column(2).z());
+        }
+        else{
+            translation.setX(translation.x() - view.column(2).x());
+            translation.setY(translation.y() - view.column(2).y());
+            translation.setZ(translation.z() + view.column(2).z());
+            camPos += QVector3D(view.column(2).x(),view.column(2).y(),view.column(2).z());
+        }
+
     }
     if(pressedKeys.contains(Qt::Key_S)){
-        translation.setX(translation.x() + view.column(2).x());
-        translation.setY(translation.y() + view.column(2).y());
-        translation.setZ(translation.z() - view.column(2).z());
-        camPos -= QVector3D(view.column(2).x(),0,view.column(2).z());
+        if(collision(mur->getPos(),mur->BB,camPos,player->BB)){
+            translation.setX(translation.x() - view.column(2).x());
+            translation.setY(translation.y() - view.column(2).y());
+            translation.setZ(translation.z() + view.column(2).z());
+            camPos += QVector3D(view.column(2).x(),view.column(2).y(),view.column(2).z());
+        }
+        else{
+            translation.setX(translation.x() + view.column(2).x());
+            translation.setY(translation.y() + view.column(2).y());
+            translation.setZ(translation.z() - view.column(2).z());
+            camPos -= QVector3D(view.column(2).x(),0,view.column(2).z());
+        }
+
 
     }
     if(pressedKeys.contains(Qt::Key_Q)){
@@ -266,7 +292,6 @@ void MainWidget::timerEvent(QTimerEvent *)
     }
     std::cout << "Cam Pos: "<< camPos.x() << " " << camPos.y() << " " << camPos.z() << std::endl;
     if(inJump){
-        inAir = true;
 
         translation.setX(translation.x() - view.column(1).x());
         translation.setY(translation.y() - view.column(1).y());
@@ -281,21 +306,25 @@ void MainWidget::timerEvent(QTimerEvent *)
         }
     }
     else{
-        if(inAir){
 
-            translation.setX(translation.x() + view.column(1).x());
-            translation.setY(translation.y() + view.column(1).y());
-            translation.setZ(translation.z() - view.column(1).z());
+            if(!collision(camPos,player->BB,plan->getPos(),plan->BB)){
+                translation.setX(translation.x() + view.column(1).x());
+                translation.setY(translation.y() + view.column(1).y());
+                translation.setZ(translation.z() - view.column(1).z());
 
-            camPos -= QVector3D(0,view.column(1).y(),0);
-
-
-            if(camPos.y() <= 0){
-                inAir = false;
+                camPos -= QVector3D(0,view.column(1).y(),0);
             }
 
 
-        }
+    }
+    if(camPos.y() <= -50){
+        //on reset
+        translation.setX(0);translation.setY(0);translation.setZ(0);
+        yaw=0.0;
+        pitch=0.0;
+        camPos = QVector3D(0,0,0);
+
+
 
     }
     if(collision(cube2->getPos(),cube2->BB,camPos,player->BB)){
@@ -343,6 +372,8 @@ void MainWidget::initializeGL()
     truc->addComponent(trucRenderer);
     GameComponent* cube2Renderer=new MeshRenderer(5.0,5.0,5.0);
     cube2->addComponent(cube2Renderer);
+    GameComponent* murRenderer=new MeshRenderer(05.0,20.0,50.0);
+    mur->addComponent(murRenderer);
 
     // Use QBasicTimer because its faster than QTimer
     timer.start(12, this);
