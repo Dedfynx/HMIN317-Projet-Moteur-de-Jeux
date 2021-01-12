@@ -5,6 +5,7 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     boundingbox.cpp \
+    collision.cpp \
     gamecomponent.cpp \
     gameobject.cpp \
     mesh.cpp \
@@ -18,6 +19,7 @@ SOURCES += \
 HEADERS += \
     BasicIO.h \
     boundingbox.h \
+    collision.h \
     gamecomponent.h \
     gameobject.h \
     mainwidget.h \

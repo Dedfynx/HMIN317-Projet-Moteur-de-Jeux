@@ -129,6 +129,9 @@ private:
 
     GameComponent* planRenderer;
     GameComponent* trucRenderer;
+
+    bool inJump,inAir;
+    int cptSaut;
 };
 
 #endif // MAINWIDGET_H

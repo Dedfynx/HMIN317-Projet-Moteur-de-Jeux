@@ -80,7 +80,10 @@ MainWidget::MainWidget(QWidget *parent) :
     center = QVector3D(0.0f,0.0f,0.0f),up = QVector3D(0.0f,1.0f,0.0f);
     camSpeed = 0.05f;
 
-
+    //gestion saut
+    inJump = false;
+    inAir = false;
+    cptSaut = 30;
     //view matrix
 
     yaw=0.0;
@@ -245,6 +248,12 @@ void MainWidget::keyPressEvent(QKeyEvent *ev){
                 rotation = QQuaternion::fromAxisAndAngle(QVector3D(0,1,0), 5) * rotation;
                 update();
                 break;
+
+             case Qt::Key_Space:
+                    if(!inAir){
+                        inJump = true;
+                    }
+
     case Qt::Key_I :
 
         break;
@@ -258,6 +267,31 @@ void MainWidget::timerEvent(QTimerEvent *)
     //update
 
     update();
+    if(inJump){
+        inAir = true;
+        translation.setX(translation.x() - view.column(1).x());
+        translation.setY(translation.y() - view.column(1).y());
+        translation.setZ(translation.z() + view.column(1).z());
+
+        cptSaut --;
+        if(cptSaut <= 0){
+            inJump = false;
+            cptSaut = 30;
+        }
+    }
+    else{
+        if(inAir){
+            translation.setX(translation.x() + view.column(1).x());
+            translation.setY(translation.y() + view.column(1).y());
+            translation.setZ(translation.z() - view.column(1).z());
+            /*
+            if(translation.y() <= 0){
+                inAir = false;
+            }
+            */
+        }
+
+    }
 
     //
     // Decrease angular speed (friction)

@@ -8,7 +8,7 @@ public:
     BoundingBox();
     BoundingBox(float x, float y, float z);
 
-    ChangeBoundingBox(float x, float y, float z);
+    void ChangeBoundingBox(float x, float y, float z);
 
     float sizeX;
     float sizeY;
