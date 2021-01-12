@@ -83,6 +83,7 @@ protected:
     void timerEvent(QTimerEvent *e) override;
 
     void keyPressEvent(QKeyEvent *e) override;
+    void keyReleaseEvent(QKeyEvent *e) override;
 
     void initializeGL() override;
     void resizeGL(int w, int h) override;
@@ -132,6 +133,8 @@ private:
 
     bool inJump,inAir;
     int cptSaut;
+
+    QSet<int> pressedKeys;
 };
 
 #endif // MAINWIDGET_H

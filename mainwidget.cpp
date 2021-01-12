@@ -168,98 +168,11 @@ void MainWidget::mouseReleaseEvent(QMouseEvent *e)
 }
 //! [0]
 void MainWidget::keyPressEvent(QKeyEvent *ev){
-    switch ( ev->key() )
-        {
-            case Qt::Key_Escape :
-                close();
-                break;
-            case Qt::Key_Z :
+    pressedKeys += ev->key();
+}
 
-                translation.setX(translation.x() - view.column(2).x());
-                translation.setY(translation.y() - view.column(2).y());
-                translation.setZ(translation.z() + view.column(2).z());
-        
-                update();
-                break;
-
-            case Qt::Key_Q :
-               
-                yaw-=0.1;
-                update();
-                break;
-
-            case Qt::Key_S :
-
-                translation.setX(translation.x() + view.column(2).x());
-                translation.setY(translation.y() + view.column(2).y());
-                translation.setZ(translation.z() - view.column(2).z());
-
-                update();
-                break;
-
-            case Qt::Key_D :
-              
-                yaw+=0.1;
-                update();
-                break;
-
-            case Qt::Key_Up:
-
-                translation.setX(translation.x() - view.column(1).x());
-                translation.setY(translation.y() - view.column(1).y());
-                translation.setZ(translation.z() + view.column(1).z());
-
-                update();
-                break;
-            case Qt::Key_Down:
-
-                translation.setX(translation.x() + view.column(1).x());
-                translation.setY(translation.y() + view.column(1).y());
-                translation.setZ(translation.z() - view.column(1).z());
-
-                update();
-                break;
-            case Qt::Key_Right:
-                
-                translation.setX(translation.x() - view.column(0).x());
-                translation.setY(translation.y() - view.column(0).y());
-                translation.setZ(translation.z() + view.column(0).z());
-
-                update();
-                break;
-            case Qt::Key_Left:
-
-                translation.setX(translation.x() + view.column(0).x());
-                translation.setY(translation.y() + view.column(0).y());
-                translation.setZ(translation.z() - view.column(0).z());
-
-                update();
-                break;
-            case Qt::Key_C :
-                //mode orbital
-
-                //orbital ^= true;
-                //rester appuyer sur C
-                /*
-                if(orbital){
-                    rotation = QQuaternion::fromAxisAndAngle(QVector3D(0,1,0), 5) * rotation;
-                }
-                */
-                rotation = QQuaternion::fromAxisAndAngle(QVector3D(0,1,0), 5) * rotation;
-                update();
-                break;
-
-             case Qt::Key_Space:
-                    if(!inAir){
-                        inJump = true;
-                    }
-
-    case Qt::Key_I :
-
-        break;
-        }
-    //printf("\nkey event in board: %i", ev->key());
-
+void MainWidget::keyReleaseEvent(QKeyEvent *e){
+    pressedKeys -= e->key();
 }
 //! [1]
 void MainWidget::timerEvent(QTimerEvent *)
@@ -267,6 +180,30 @@ void MainWidget::timerEvent(QTimerEvent *)
     //update
 
     update();
+    //gestion touche
+
+    if(pressedKeys.contains(Qt::Key_Z)){
+        translation.setX(translation.x() - view.column(2).x());
+        translation.setY(translation.y() - view.column(2).y());
+        translation.setZ(translation.z() + view.column(2).z());
+    }
+    if(pressedKeys.contains(Qt::Key_S)){
+        translation.setX(translation.x() + view.column(2).x());
+        translation.setY(translation.y() + view.column(2).y());
+        translation.setZ(translation.z() - view.column(2).z());
+    }
+    if(pressedKeys.contains(Qt::Key_Q)){
+        yaw-=0.1;
+    }
+    if(pressedKeys.contains(Qt::Key_D)){
+        yaw+=0.1;
+    }
+    if(pressedKeys.contains(Qt::Key_Space)){
+        if(!inAir){
+            inJump = true;
+        }
+    }
+
     if(inJump){
         inAir = true;
         translation.setX(translation.x() - view.column(1).x());
