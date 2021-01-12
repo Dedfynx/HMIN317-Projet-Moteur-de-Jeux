@@ -53,10 +53,55 @@
 #include "GameComponent.h"
 #include "MeshRenderer.h"
 #include "iostream"
+#include "BoundingBox.h"
 
 #include <QMouseEvent>
 
 #include <math.h>
+
+bool collision(QVector3D pos1,BoundingBox box1,QVector3D pos2, BoundingBox box2){
+    QVector3D debutBoite1=pos1;
+    QVector3D finBoite1=QVector3D(pos1.x()+box1.sizeX,pos1.y()+box1.sizeY,pos1.z()+box1.sizeZ);
+    QVector3D debutBoite2=pos2;
+    QVector3D finBoite2=QVector3D(pos2.x()+box2.sizeX,pos2.y()+box2.sizeY,pos2.z()+box2.sizeZ);
+
+    //axeX
+    if(debutBoite1.x() < debutBoite2.x() && debutBoite1.x() < finBoite2.x()){
+        if(finBoite1.x() < debutBoite2.x() && finBoite1.x() < finBoite2.x()){
+            return false;
+        }
+    }
+    if(debutBoite1.x() > debutBoite2.x() && debutBoite1.x() > finBoite2.x()){
+        if(finBoite1.x() > debutBoite2.x() && finBoite1.x() > finBoite2.x()){
+            return false;
+        }
+    }
+
+    //axeY
+    if(debutBoite1.y() < debutBoite2.y() && debutBoite1.y() < finBoite2.y()){
+        if(finBoite1.y() < debutBoite2.y() && finBoite1.y() < finBoite2.y()){
+            return false;
+        }
+    }
+    if(debutBoite1.y() > debutBoite2.y() && debutBoite1.y() > finBoite2.y()){
+        if(finBoite1.y() > debutBoite2.y() && finBoite1.y() > finBoite2.y()){
+            return false;
+        }
+    }
+
+        //axeZ
+    if(debutBoite1.z() < debutBoite2.z() && debutBoite1.z() < finBoite2.z()){
+        if(finBoite1.z() < debutBoite2.z() && finBoite1.z() < finBoite2.z()){
+            return false;
+        }
+    }
+    if(debutBoite1.z() > debutBoite2.z() && debutBoite1.z() > finBoite2.z()){
+        if(finBoite1.z() > debutBoite2.z() && finBoite1.z() > finBoite2.z()){
+            return false;
+        }
+    }
+    return true;
+}
 
 MainWidget::MainWidget(QWidget *parent) :
     QOpenGLWidget(parent),
@@ -70,11 +115,16 @@ MainWidget::MainWidget(QWidget *parent) :
     trucRenderer()
 {
 
-    root = new GameObject();
-    camera = new GameObject();
-    plan = new GameObject();
-    truc = new GameObject();
-    cube2 = new GameObject();
+    root = new GameObject();    //listGameObject.push_back(root);
+    camera = new GameObject();  //listGameObject.push_back(camera);
+    plan = new GameObject();    listGameObject.push_back(plan);
+    truc = new GameObject();    listGameObject.push_back(truc);
+    cube2 = new GameObject();   listGameObject.push_back(cube2);
+
+    cube2->BB.changeBoundingBox(5.0,5.0,5.0);
+    cube2->BB.changeBoundingBox(30.0,30.0,-1.0);
+    truc->BB.changeBoundingBox(1.0,1.0,-1.0);
+    camera->BB.changeBoundingBox(0.5,-0.5,0.5);
 
     camPos = QVector3D(0.0f,0.0f,0.0f);
     center = QVector3D(0.0f,0.0f,0.0f),up = QVector3D(0.0f,1.0f,0.0f);
@@ -84,6 +134,7 @@ MainWidget::MainWidget(QWidget *parent) :
     inJump = false;
     inAir = false;
     cptSaut = 30;
+
     //view matrix
 
     yaw=0.0;
@@ -368,7 +419,9 @@ void MainWidget::paintGL()
 
     view.translate(translation);
 
-    ///////////////
+    camera->transform.update(view);
+
+    /////////////// 
     
     /*
     //chute et verif

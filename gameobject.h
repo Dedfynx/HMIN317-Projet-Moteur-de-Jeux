@@ -5,6 +5,7 @@
 
 #include "transform.h"
 #include "gameComponent.h"
+#include "BoundingBox.h"
 
 class GameObject
 {
@@ -25,6 +26,8 @@ public:
 
     Transform transform;
     Transform localTransform;
+
+    BoundingBox BB;
 
     std::vector<float> getPos();
     void setPos(float x,float y,float z);

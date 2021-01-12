@@ -10,7 +10,7 @@ BoundingBox::BoundingBox(float x, float y, float z){
 	sizeZ=z;
 }
 
-void BoundingBox::ChangeBoundingBox(float x, float y, float z){
+void BoundingBox::changeBoundingBox(float x, float y, float z){
 	sizeX=x;
 	sizeY=y;
 	sizeZ=z;

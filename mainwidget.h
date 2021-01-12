@@ -118,6 +118,8 @@ private:
 
     QVector3D translation;
 
+    std::vector<GameObject*> listGameObject;
+
     //tp3
     GameObject* root;
     GameObject* camera;
