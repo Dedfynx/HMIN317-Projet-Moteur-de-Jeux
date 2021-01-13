@@ -65,7 +65,7 @@
 #include "gameobject.h"
 #include "GameComponent.h"
 #include "MeshRenderer.h"
-
+#include "iaennemis.h"
 
 class GeometryEngine;
 
@@ -130,6 +130,8 @@ private:
     GameObject* cube2;
     GameObject* mur;
     GameObject* player;
+    GameObject* ennemis;
+    iaEnnemis* iaEnnemis1;
 
 
     GameComponent* planRenderer;

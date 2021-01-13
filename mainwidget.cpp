@@ -54,6 +54,7 @@
 #include "MeshRenderer.h"
 #include "iostream"
 #include "BoundingBox.h"
+#include "iaennemis.h"
 
 #include <QMouseEvent>
 
@@ -121,6 +122,12 @@ MainWidget::MainWidget(QWidget *parent) :
     truc = new GameObject();    listGameObject.push_back(truc);
     cube2 = new GameObject();   listGameObject.push_back(cube2);
     mur = new GameObject();
+    mur->BB.changeBoundingBox(5,20,50);
+
+    ennemis = new GameObject();
+    ennemis->BB.changeBoundingBox(5.0,10.0,5.0);
+    ennemis->setPos(-10,0,10);
+    iaEnnemis1 =new iaEnnemis();
 
     player = new GameObject();
     player->BB.changeBoundingBox(5.0,10.0,5.0);
@@ -130,7 +137,7 @@ MainWidget::MainWidget(QWidget *parent) :
     truc->BB.changeBoundingBox(1.0,1.0,-1.0);
     camera->BB.changeBoundingBox(0.5,-0.5,0.5);
 
-    mur->BB.changeBoundingBox(5,20,50);
+
 
     camPos = QVector3D(0.0f,0.0f,0.0f);
     center = QVector3D(0.0f,0.0f,0.0f),up = QVector3D(0.0f,1.0f,0.0f);
@@ -173,6 +180,7 @@ MainWidget::MainWidget(QWidget *parent) :
     root->addEnfant(plan);
     root->addEnfant(cube2);
     root->addEnfant(mur);
+    root->addEnfant(ennemis);
 
     plan->addEnfant(truc);
 
@@ -191,6 +199,8 @@ MainWidget::MainWidget(QWidget *parent) :
 
     mur->localTransform.translate(QVector3D(50,8,20));
     mur->setPos(50,0,-70);
+
+    ennemis->localTransform.translate(QVector3D(-10,0,10));
 
 }
 
@@ -283,7 +293,7 @@ void MainWidget::timerEvent(QTimerEvent *)
         yaw+=0.1;
     }
     if(pressedKeys.contains(Qt::Key_Space)){
-        if(!inAir){
+        if(!inJump && !inAir){
             inJump = true;
         }
     }
@@ -301,6 +311,7 @@ void MainWidget::timerEvent(QTimerEvent *)
 
         cptSaut --;
         if(cptSaut <= 0){
+            inAir = true;
             inJump = false;
             cptSaut = 30;
         }
@@ -314,6 +325,9 @@ void MainWidget::timerEvent(QTimerEvent *)
 
                 camPos -= QVector3D(0,view.column(1).y(),0);
             }
+            else{
+                inAir = false;
+            }
 
 
     }
@@ -323,27 +337,24 @@ void MainWidget::timerEvent(QTimerEvent *)
         yaw=0.0;
         pitch=0.0;
         camPos = QVector3D(0,0,0);
-
-
-
     }
+
     if(collision(cube2->getPos(),cube2->BB,camPos,player->BB)){
         root->removeEnfant(cube2);
     }
-    //
-    // Decrease angular speed (friction)
-    angularSpeed *= 0.99;
 
-    // Stop rotation when speed goes below threshold
-    if (angularSpeed < 0.01) {
-        angularSpeed = 0.0;
-    } else {
-        // Update rotation
-        rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed) * rotation;
-
-        // Request an update
-        update();
+    //enemis ia
+    if(iaEnnemis1->isInPatrouille()){
+        if(iaEnnemis1->getCpt() < iaEnnemis1->getNbPas()){
+            ennemis->localTransform.translate(QVector3D(0,0,iaEnnemis1->getDirection() * 0.1));
+            iaEnnemis1->setCpt(iaEnnemis1->getCpt()+0.1);
+        }
+        else{
+           iaEnnemis1->changeDir();
+           iaEnnemis1->setCpt(0.0);
+        }
     }
+
 }
 //! [1]
 
@@ -374,6 +385,8 @@ void MainWidget::initializeGL()
     cube2->addComponent(cube2Renderer);
     GameComponent* murRenderer=new MeshRenderer(05.0,20.0,50.0);
     mur->addComponent(murRenderer);
+    GameComponent* ennemisRender=new MeshRenderer(05.0,10.0,5.0);
+    ennemis->addComponent(ennemisRender);
 
     // Use QBasicTimer because its faster than QTimer
     timer.start(12, this);

@@ -8,6 +8,7 @@ SOURCES += main.cpp \
     collision.cpp \
     gamecomponent.cpp \
     gameobject.cpp \
+    iaennemis.cpp \
     mesh.cpp \
     meshrenderer.cpp \
     transform.cpp
@@ -22,6 +23,7 @@ HEADERS += \
     collision.h \
     gamecomponent.h \
     gameobject.h \
+    iaennemis.h \
     mainwidget.h \
     geometryengine.h \
     mesh.h \
