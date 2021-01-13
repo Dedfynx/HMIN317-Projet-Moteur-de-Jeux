@@ -2,5 +2,7 @@
     <qresource prefix="/">
         <file>cube.png</file>
         <file>rock.png</file>
+        <file>TP2_ressources/grass.png</file>
+        <file>TP2_ressources/snowrocks.png</file>
     </qresource>
 </RCC>

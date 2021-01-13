@@ -13,6 +13,7 @@ using namespace std;
 #include "Mesh.h"
 #include "GameComponent.h"
 
+
 #include <QOpenGLFunctions_3_1>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
@@ -27,10 +28,12 @@ private:
     QOpenGLBuffer indexBuf;
     int nbIndices;
 
+    QOpenGLTexture *texture;
+
 public:
-	MeshRenderer(const QString& filename);
-	MeshRenderer(float sizeX,float sizeY,float sizeZ); //boite
-	MeshRenderer(float sizeX,float sizeY); //plan
+	MeshRenderer(const QString& filename,char* pathTexture);
+	MeshRenderer(float sizeX,float sizeY,float sizeZ,char* pathTexture); //boite
+	MeshRenderer(float sizeX,float sizeY,char* pathTexture); //plan
 
 	~MeshRenderer();
 

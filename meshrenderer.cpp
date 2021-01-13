@@ -18,7 +18,8 @@ using namespace std;
 #include "MeshRenderer.h"
 
 
-MeshRenderer::MeshRenderer(const QString& filename): GameComponent(), indexBuf(QOpenGLBuffer::IndexBuffer){
+
+MeshRenderer::MeshRenderer(const QString& filename,char* pathTexture): GameComponent(), indexBuf(QOpenGLBuffer::IndexBuffer){
 
 	mesh=Mesh(filename);
 	initializeOpenGLFunctions();
@@ -35,9 +36,23 @@ MeshRenderer::MeshRenderer(const QString& filename): GameComponent(), indexBuf(Q
    	indexBuf.bind();
    	indexBuf.allocate(&mesh.triangles[0], nbIndices * sizeof(GLushort));	
 
+    //init texture
+
+    texture = new QOpenGLTexture(QImage(pathTexture).mirrored());
+
+    // Set nearest filtering mode for texture minification
+    texture->setMinificationFilter(QOpenGLTexture::Nearest);
+
+    // Set bilinear filtering mode for texture magnification
+    texture->setMagnificationFilter(QOpenGLTexture::Linear);
+
+    // Wrap texture coordinates by repeating
+    // f.ex. texture coordinate (1.1, 1.2) is same as (0.1, 0.2)
+    texture->setWrapMode(QOpenGLTexture::Repeat);
+
 }
 
-MeshRenderer::MeshRenderer(float sizeX,float sizeY,float sizeZ): GameComponent(), indexBuf(QOpenGLBuffer::IndexBuffer){
+MeshRenderer::MeshRenderer(float sizeX,float sizeY,float sizeZ,char* pathTexture): GameComponent(), indexBuf(QOpenGLBuffer::IndexBuffer){
 
 	mesh=Mesh(sizeX,sizeY,sizeZ);
 	initializeOpenGLFunctions();
@@ -54,9 +69,23 @@ MeshRenderer::MeshRenderer(float sizeX,float sizeY,float sizeZ): GameComponent()
    	indexBuf.bind();
    	indexBuf.allocate(&mesh.triangles[0], nbIndices * sizeof(GLushort));	
 
+        //init texture
+
+    texture = new QOpenGLTexture(QImage(pathTexture).mirrored());
+
+    // Set nearest filtering mode for texture minification
+    texture->setMinificationFilter(QOpenGLTexture::Nearest);
+
+    // Set bilinear filtering mode for texture magnification
+    texture->setMagnificationFilter(QOpenGLTexture::Linear);
+
+    // Wrap texture coordinates by repeating
+    // f.ex. texture coordinate (1.1, 1.2) is same as (0.1, 0.2)
+    texture->setWrapMode(QOpenGLTexture::Repeat);
+
 }
 
-MeshRenderer::MeshRenderer(float sizeX,float sizeY): GameComponent(), indexBuf(QOpenGLBuffer::IndexBuffer){
+MeshRenderer::MeshRenderer(float sizeX,float sizeY,char* pathTexture): GameComponent(), indexBuf(QOpenGLBuffer::IndexBuffer){
 
 	mesh=Mesh(sizeX,sizeY);
 	initializeOpenGLFunctions();
@@ -72,6 +101,20 @@ MeshRenderer::MeshRenderer(float sizeX,float sizeY): GameComponent(), indexBuf(Q
     // Transfer index data to VBO 1
    	indexBuf.bind();
    	indexBuf.allocate(&mesh.triangles[0], nbIndices * sizeof(GLushort));	
+
+        //init texture
+
+    texture = new QOpenGLTexture(QImage(pathTexture).mirrored());
+
+    // Set nearest filtering mode for texture minification
+    texture->setMinificationFilter(QOpenGLTexture::Nearest);
+
+    // Set bilinear filtering mode for texture magnification
+    texture->setMagnificationFilter(QOpenGLTexture::Linear);
+
+    // Wrap texture coordinates by repeating
+    // f.ex. texture coordinate (1.1, 1.2) is same as (0.1, 0.2)
+    texture->setWrapMode(QOpenGLTexture::Repeat);
 
 }
 
@@ -90,8 +133,9 @@ void MeshRenderer::update(){
 
 void MeshRenderer::render(QOpenGLShaderProgram *program,QMatrix4x4 mvp){
 
+  texture->bind();
 
-	program->setUniformValue("mvp_matrix",mvp);
+  	program->setUniformValue("mvp_matrix",mvp);
     program->setUniformValue("texture", 0);
 
    	// Offset for position

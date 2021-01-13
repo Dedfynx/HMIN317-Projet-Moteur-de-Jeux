@@ -377,15 +377,15 @@ void MainWidget::initializeGL()
 
     //geometries = new GeometryEngine;
 
-    GameComponent* planRenderer=new MeshRenderer(30.0,30.0);
+    GameComponent* planRenderer=new MeshRenderer(30.0,30.0,":/TP2_ressources/grass.png");
     plan->addComponent(planRenderer);
-    GameComponent* trucRenderer=new MeshRenderer(1.0,1.0,1.0);
+    GameComponent* trucRenderer=new MeshRenderer(1.0,1.0,1.0,":/TP2_ressources/snowrocks.png");
     truc->addComponent(trucRenderer);
-    GameComponent* cube2Renderer=new MeshRenderer(5.0,5.0,5.0);
+    GameComponent* cube2Renderer=new MeshRenderer(5.0,5.0,5.0,":/TP2_ressources/snowrocks.png");
     cube2->addComponent(cube2Renderer);
-    GameComponent* murRenderer=new MeshRenderer(05.0,20.0,50.0);
+    GameComponent* murRenderer=new MeshRenderer(05.0,20.0,50.0,":/rock.png");
     mur->addComponent(murRenderer);
-    GameComponent* ennemisRender=new MeshRenderer(05.0,10.0,5.0);
+    GameComponent* ennemisRender=new MeshRenderer(05.0,10.0,5.0,":/cube.png");
     ennemis->addComponent(ennemisRender);
 
     // Use QBasicTimer because its faster than QTimer
@@ -428,6 +428,12 @@ void MainWidget::initTextures()
     // Wrap texture coordinates by repeating
     // f.ex. texture coordinate (1.1, 1.2) is same as (0.1, 0.2)
     texture->setWrapMode(QOpenGLTexture::Repeat);
+
+    ///////
+
+
+
+
 }
 //! [4]
 
@@ -455,7 +461,7 @@ void MainWidget::paintGL()
     // Clear color and depth buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    texture->bind();
+    //texture->bind();
 
 //! [6]
     // Calculate model view transformation
