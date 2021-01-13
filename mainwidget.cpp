@@ -287,10 +287,10 @@ void MainWidget::timerEvent(QTimerEvent *)
 
     }
     if(pressedKeys.contains(Qt::Key_Q)){
-        yaw-=0.1;
+        yaw-=0.05;
     }
     if(pressedKeys.contains(Qt::Key_D)){
-        yaw+=0.1;
+        yaw+=0.05;
     }
     if(pressedKeys.contains(Qt::Key_Space)){
         if(!inJump && !inAir){
@@ -444,7 +444,7 @@ void MainWidget::resizeGL(int w, int h)
     qreal aspect = qreal(w) / qreal(h ? h : 1);
 
     // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
-    const qreal zNear = 1.0, zFar = 500.0, fov = 45.0;
+    const qreal zNear = 1.0, zFar = 500.0, fov = 60.0;
 
     // Reset projection
     projection.setToIdentity();
