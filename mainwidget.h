@@ -130,6 +130,8 @@ private:
     GameObject* cube2;
     GameObject* mur;
     GameObject* mur2;
+    GameObject* mur3;
+
     GameObject* player;
     GameObject* ennemis;
     iaEnnemis* iaEnnemis1;

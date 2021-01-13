@@ -4,5 +4,6 @@
         <file>rock.png</file>
         <file>TP2_ressources/grass.png</file>
         <file>TP2_ressources/snowrocks.png</file>
+        <file>TP2_ressources/wall.png</file>
     </qresource>
 </RCC>

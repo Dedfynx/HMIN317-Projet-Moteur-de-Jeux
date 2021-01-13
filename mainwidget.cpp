@@ -122,13 +122,16 @@ MainWidget::MainWidget(QWidget *parent) :
     truc = new GameObject();    listGameObject.push_back(truc);
     cube2 = new GameObject();   listGameObject.push_back(cube2);
     mur = new GameObject();
-    mur->BB.changeBoundingBox(5,20,50);
+    mur->BB.changeBoundingBox(6,20,100);
     mur2 = new GameObject();
-    mur2->BB.changeBoundingBox(50,20,6);
+    mur2->BB.changeBoundingBox(100,20,6);
+    mur3 = new GameObject();
+    mur3->BB.changeBoundingBox(100,20,6);
+
 
     ennemis = new GameObject();
     ennemis->BB.changeBoundingBox(5.0,10.0,5.0);
-    ennemis->setPos(-10,0,10);
+    ennemis->setPos(-10,0,-10);
     iaEnnemis1 =new iaEnnemis();
 
     player = new GameObject();
@@ -152,7 +155,7 @@ MainWidget::MainWidget(QWidget *parent) :
 
     //view matrix
 
-    yaw=0.0;
+    yaw=20.0;
     pitch=0.0;
     // I assume the values are already converted to radians.
     float cosPitch = cos(pitch);
@@ -183,6 +186,8 @@ MainWidget::MainWidget(QWidget *parent) :
     root->addEnfant(cube2);
     root->addEnfant(mur);
     root->addEnfant(mur2);
+    root->addEnfant(mur3);
+
     root->addEnfant(ennemis);
 
     plan->addEnfant(truc);
@@ -200,11 +205,16 @@ MainWidget::MainWidget(QWidget *parent) :
     cube2->localTransform.translate(QVector3D(10.0,0.0,10.0));
     cube2->setPos(10.0,0.0,-10.0);
 
-    mur->localTransform.translate(QVector3D(50,8,20));
+    mur->localTransform.translate(QVector3D(50,8,-30));
     mur->setPos(50,0.0,-70);
 
-    mur2->localTransform.translate(QVector3D(0,8,60));
-    mur2->setPos(0.0,0.0,-65);
+    mur2->localTransform.translate(QVector3D(-50,8,60));
+    mur2->setPos(-50.0,0.0,-65);
+
+    mur3->localTransform.translate(QVector3D(-50,8,-30));
+    mur3->setPos(-50,0.0,25);
+
+
 
     ennemis->localTransform.translate(QVector3D(-10,0,10));
 }
@@ -261,11 +271,11 @@ void MainWidget::timerEvent(QTimerEvent *)
     //gestion touche
 
     if(pressedKeys.contains(Qt::Key_Z)){
-        if(collision(mur->getPos(),mur->BB,camPos,player->BB) || collision(mur2->getPos(),mur2->BB,camPos,player->BB)){
-            translation.setX(translation.x() + 1.5*view.column(2).x());
-            translation.setY(translation.y() + 1.5*view.column(2).y());
-            translation.setZ(translation.z() - 1.5*view.column(2).z());
-            camPos -= QVector3D(1.5*view.column(2).x(),1.5*view.column(2).y(),1.5*view.column(2).z());
+        if(collision(mur->getPos(),mur->BB,camPos,player->BB) || collision(mur2->getPos(),mur2->BB,camPos,player->BB) || collision(mur3->getPos(),mur3->BB,camPos,player->BB)){
+            translation.setX(translation.x() + 2*view.column(2).x());
+            translation.setY(translation.y() + 2*view.column(2).y());
+            translation.setZ(translation.z() - 2*view.column(2).z());
+            camPos -= QVector3D(2*view.column(2).x(),2*view.column(2).y(),2*view.column(2).z());
         }
         else{
             translation.setX(translation.x() - view.column(2).x());
@@ -276,11 +286,11 @@ void MainWidget::timerEvent(QTimerEvent *)
     }
 
     if(pressedKeys.contains(Qt::Key_S)){
-        if(collision(mur->getPos(),mur->BB,camPos,player->BB) || collision(mur2->getPos(),mur2->BB,camPos,player->BB)){
-            translation.setX(translation.x() - view.column(2).x());
-            translation.setY(translation.y() - view.column(2).y());
-            translation.setZ(translation.z() + view.column(2).z());
-            camPos += QVector3D(view.column(2).x(),view.column(2).y(),view.column(2).z());
+        if(collision(mur->getPos(),mur->BB,camPos,player->BB) || collision(mur2->getPos(),mur2->BB,camPos,player->BB) || collision(mur3->getPos(),mur3->BB,camPos,player->BB)){
+            translation.setX(translation.x() - 2*view.column(2).x());
+            translation.setY(translation.y() - 2*view.column(2).y());
+            translation.setZ(translation.z() + 2*view.column(2).z());
+            camPos += QVector3D(2*view.column(2).x(),2*view.column(2).y(),2*view.column(2).z());
         }
         else{
             translation.setX(translation.x() + view.column(2).x());
@@ -303,7 +313,7 @@ void MainWidget::timerEvent(QTimerEvent *)
         }
     }
     if(pressedKeys.contains(Qt::Key_A)){
-        root->removeEnfant(cube2);
+        //root->removeEnfant(cube2);
     }
     std::cout << "Cam Pos: "<< camPos.x() << " " << camPos.y() << " " << camPos.z() << std::endl;
     if(inJump){
@@ -339,13 +349,21 @@ void MainWidget::timerEvent(QTimerEvent *)
     if(camPos.y() <= -50){
         //on reset
         translation.setX(0);translation.setY(0);translation.setZ(0);
-        yaw=0.0;
+        yaw=20.0;
         pitch=0.0;
         camPos = QVector3D(0,0,0);
     }
 
     if(collision(cube2->getPos(),cube2->BB,camPos,player->BB)){
         root->removeEnfant(cube2);
+    }
+
+    if(collision(ennemis->getPos(),ennemis->BB,camPos,player->BB)){
+        //on reset
+        translation.setX(0);translation.setY(0);translation.setZ(0);
+        yaw=20.0;
+        pitch=0.0;
+        camPos = QVector3D(0,0,0);
     }
 
     //enemis ia
@@ -389,10 +407,13 @@ void MainWidget::initializeGL()
     truc->addComponent(trucRenderer);
     GameComponent* cube2Renderer=new MeshRenderer(5.0,5.0,5.0,":/TP2_ressources/snowrocks.png");
     cube2->addComponent(cube2Renderer);
-    GameComponent* murRenderer=new MeshRenderer(05.0,20.0,50.0,":/rock.png");
+    GameComponent* murRenderer=new MeshRenderer(05.0,20.0,100.0,":/TP2_ressources/wall.png");
     mur->addComponent(murRenderer);
-    GameComponent* mur2Renderer=new MeshRenderer(50.0,20.0,5.0,":/rock.png");
+    GameComponent* mur2Renderer=new MeshRenderer(100.0,20.0,5.0,":/TP2_ressources/wall.png");
     mur2->addComponent(mur2Renderer);
+    GameComponent* mur3Renderer=new MeshRenderer(100.0,20.0,5.0,":/TP2_ressources/wall.png");
+    mur3->addComponent(mur3Renderer);
+
     GameComponent* ennemisRender=new MeshRenderer(05.0,10.0,5.0,":/cube.png");
     ennemis->addComponent(ennemisRender);
 
