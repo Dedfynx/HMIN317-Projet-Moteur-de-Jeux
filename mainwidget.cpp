@@ -129,6 +129,7 @@ MainWidget::MainWidget(QWidget *parent) :
     mur3->BB.changeBoundingBox(100,20,6);
 
 
+
     ennemis = new GameObject();
     ennemis->BB.changeBoundingBox(5.0,10.0,5.0);
     ennemis->setPos(-10,0,-10);
@@ -414,7 +415,7 @@ void MainWidget::initializeGL()
     GameComponent* mur3Renderer=new MeshRenderer(100.0,20.0,5.0,":/TP2_ressources/wall.png");
     mur3->addComponent(mur3Renderer);
 
-    GameComponent* ennemisRender=new MeshRenderer(05.0,10.0,5.0,":/cube.png");
+    GameComponent* ennemisRender=new MeshRenderer(05.0,10.0,5.0,":/TP2_ressources/bark.jpg");
     ennemis->addComponent(ennemisRender);
 
     // Use QBasicTimer because its faster than QTimer

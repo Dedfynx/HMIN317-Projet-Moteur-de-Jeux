@@ -132,6 +132,8 @@ private:
     GameObject* mur2;
     GameObject* mur3;
 
+    GameObject* porte;
+
     GameObject* player;
     GameObject* ennemis;
     iaEnnemis* iaEnnemis1;
