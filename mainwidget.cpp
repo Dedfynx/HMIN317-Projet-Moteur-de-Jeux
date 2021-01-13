@@ -124,7 +124,7 @@ MainWidget::MainWidget(QWidget *parent) :
     mur = new GameObject();
     mur->BB.changeBoundingBox(5,20,50);
     mur2 = new GameObject();
-    mur2->BB.changeBoundingBox(50,20,5);
+    mur2->BB.changeBoundingBox(50,20,6);
 
     ennemis = new GameObject();
     ennemis->BB.changeBoundingBox(5.0,10.0,5.0);
@@ -203,8 +203,8 @@ MainWidget::MainWidget(QWidget *parent) :
     mur->localTransform.translate(QVector3D(50,8,20));
     mur->setPos(50,0.0,-70);
 
-    mur2->localTransform.translate(QVector3D(0,8,80));
-    mur->setPos(-50.0,0.0,-80);
+    mur2->localTransform.translate(QVector3D(0,8,60));
+    mur2->setPos(0.0,0.0,-65);
 
     ennemis->localTransform.translate(QVector3D(-10,0,10));
 }
@@ -353,6 +353,7 @@ void MainWidget::timerEvent(QTimerEvent *)
         if(iaEnnemis1->getCpt() < iaEnnemis1->getNbPas()){
             ennemis->localTransform.translate(QVector3D(0,0,iaEnnemis1->getDirection() * 0.1));
             iaEnnemis1->setCpt(iaEnnemis1->getCpt()+0.1);
+            ennemis->setPos(ennemis->getPos().x(),ennemis->getPos().y(),ennemis->getPos().z() + (-iaEnnemis1->getDirection() * 0.1));
         }
         else{
            iaEnnemis1->changeDir();
