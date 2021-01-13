@@ -123,6 +123,8 @@ MainWidget::MainWidget(QWidget *parent) :
     cube2 = new GameObject();   listGameObject.push_back(cube2);
     mur = new GameObject();
     mur->BB.changeBoundingBox(5,20,50);
+    mur2 = new GameObject();
+    mur2->BB.changeBoundingBox(50,20,5);
 
     ennemis = new GameObject();
     ennemis->BB.changeBoundingBox(5.0,10.0,5.0);
@@ -180,6 +182,7 @@ MainWidget::MainWidget(QWidget *parent) :
     root->addEnfant(plan);
     root->addEnfant(cube2);
     root->addEnfant(mur);
+    root->addEnfant(mur2);
     root->addEnfant(ennemis);
 
     plan->addEnfant(truc);
@@ -198,10 +201,12 @@ MainWidget::MainWidget(QWidget *parent) :
     cube2->setPos(10.0,0.0,-10.0);
 
     mur->localTransform.translate(QVector3D(50,8,20));
-    mur->setPos(50,0,-70);
+    mur->setPos(50,0.0,-70);
+
+    mur2->localTransform.translate(QVector3D(0,8,80));
+    mur->setPos(-50.0,0.0,-80);
 
     ennemis->localTransform.translate(QVector3D(-10,0,10));
-
 }
 
 MainWidget::~MainWidget()
@@ -256,7 +261,7 @@ void MainWidget::timerEvent(QTimerEvent *)
     //gestion touche
 
     if(pressedKeys.contains(Qt::Key_Z)){
-        if(collision(mur->getPos(),mur->BB,camPos,player->BB)){
+        if(collision(mur->getPos(),mur->BB,camPos,player->BB) || collision(mur2->getPos(),mur2->BB,camPos,player->BB)){
             translation.setX(translation.x() + 1.5*view.column(2).x());
             translation.setY(translation.y() + 1.5*view.column(2).y());
             translation.setZ(translation.z() - 1.5*view.column(2).z());
@@ -268,10 +273,10 @@ void MainWidget::timerEvent(QTimerEvent *)
             translation.setZ(translation.z() + view.column(2).z());
             camPos += QVector3D(view.column(2).x(),view.column(2).y(),view.column(2).z());
         }
-
     }
+
     if(pressedKeys.contains(Qt::Key_S)){
-        if(collision(mur->getPos(),mur->BB,camPos,player->BB)){
+        if(collision(mur->getPos(),mur->BB,camPos,player->BB) || collision(mur2->getPos(),mur2->BB,camPos,player->BB)){
             translation.setX(translation.x() - view.column(2).x());
             translation.setY(translation.y() - view.column(2).y());
             translation.setZ(translation.z() + view.column(2).z());
@@ -385,6 +390,8 @@ void MainWidget::initializeGL()
     cube2->addComponent(cube2Renderer);
     GameComponent* murRenderer=new MeshRenderer(05.0,20.0,50.0,":/rock.png");
     mur->addComponent(murRenderer);
+    GameComponent* mur2Renderer=new MeshRenderer(50.0,20.0,5.0,":/rock.png");
+    mur2->addComponent(mur2Renderer);
     GameComponent* ennemisRender=new MeshRenderer(05.0,10.0,5.0,":/cube.png");
     ennemis->addComponent(ennemisRender);
 
