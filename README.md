@@ -6,9 +6,9 @@ Moteur fait sous QtCreator avec la librairie OpenGl pour l'ue HMIN317 "Moteur de
 
 - Entity Component System
 
-- Gestion des collisions entres les divers objets
+- Gestion des collisions entre les divers objets
  
-- Texture et Shaders
+- Textures et Shaders
 
 - Personnage jouable (deplacement et interaction)
 
