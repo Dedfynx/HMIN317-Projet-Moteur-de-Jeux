@@ -2,6 +2,8 @@
 
 ## Projet Moteur de Jeux
 
+Moteur fait sous QtCreator avec la librairie OpenGl pour l'ue HMIN317 "Moteur de Jeux" du Master Imagina
+
 - Entity Component System
 
 - Gestion des collisions entres les divers objets
