@@ -4,7 +4,7 @@
 
 Moteur fait sous QtCreator avec la librairie OpenGl pour l'ue HMIN317 "Moteur de Jeux" du Master Imagina
 
-- Entity Component System
+- Entity Component
 
 - Gestion des collisions entre les divers objets
  
@@ -16,3 +16,10 @@ Moteur fait sous QtCreator avec la librairie OpenGl pour l'ue HMIN317 "Moteur de
 ### Compilation
 
 Ouvrir gameengine.pro avec le logiciel Qt Creator
+
+---
+### Demo
+
+![Image Demo](images/RenduDemo.png)
+![Video Demo](images/VideoFeaturesMoteurDeJeux.gif)
+
